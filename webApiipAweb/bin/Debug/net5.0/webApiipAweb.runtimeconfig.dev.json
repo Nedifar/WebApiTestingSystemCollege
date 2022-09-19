@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\Nedifar\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Nedifar\\.nuget\\packages"
+    ]
+  }
+}

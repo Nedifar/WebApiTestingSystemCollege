@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace webApiipAweb.PostModels
+{
+    public class CreatingChapterModel
+    {
+        public string name { get; set; }
+        public string Description { get; set; }
+        public List<CreatingTheoreticalMaterialModel> theory { get; set; } = new List<CreatingTheoreticalMaterialModel>();
+        public string levelStuding { get; set; }
+        public string nameSubject { get; set; }
+        public double award { get; set; }
+    }
+    public class CreatingTheoreticalMaterialModel
+    {
+        public string header { get; set; }
+        public string content { get; set; }
+    }
+}
