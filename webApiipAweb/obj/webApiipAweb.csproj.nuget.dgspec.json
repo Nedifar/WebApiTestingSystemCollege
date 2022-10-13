@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\webApiipAweb\\webApiipAweb\\webApiipAweb.csproj": {}
+    "C:\\Users\\Nedifar\\source\\repos\\TestSystemAPI\\webApiipAweb\\webApiipAweb.csproj": {}
   },
   "projects": {
-    "E:\\webApiipAweb\\webApiipAweb\\webApiipAweb.csproj": {
+    "C:\\Users\\Nedifar\\source\\repos\\TestSystemAPI\\webApiipAweb\\webApiipAweb.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\webApiipAweb\\webApiipAweb\\webApiipAweb.csproj",
+        "projectUniqueName": "C:\\Users\\Nedifar\\source\\repos\\TestSystemAPI\\webApiipAweb\\webApiipAweb.csproj",
         "projectName": "webApiipAweb",
-        "projectPath": "E:\\webApiipAweb\\webApiipAweb\\webApiipAweb.csproj",
+        "projectPath": "C:\\Users\\Nedifar\\source\\repos\\TestSystemAPI\\webApiipAweb\\webApiipAweb.csproj",
         "packagesPath": "C:\\Users\\Nedifar\\.nuget\\packages\\",
-        "outputPath": "E:\\webApiipAweb\\webApiipAweb\\obj\\",
+        "outputPath": "C:\\Users\\Nedifar\\source\\repos\\TestSystemAPI\\webApiipAweb\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Nedifar\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -98,7 +98,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

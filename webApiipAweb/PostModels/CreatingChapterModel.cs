@@ -11,12 +11,25 @@ namespace webApiipAweb.PostModels
         public string Description { get; set; }
         public List<CreatingTheoreticalMaterialModel> theory { get; set; } = new List<CreatingTheoreticalMaterialModel>();
         public string levelStuding { get; set; }
+        public bool access { get; set; }
         public string nameSubject { get; set; }
         public double award { get; set; }
     }
+
     public class CreatingTheoreticalMaterialModel
     {
+        public string chapterName { get; set; }
         public string header { get; set; }
         public string content { get; set; }
+        public string levelStuding { get; set; }
+        public string nameSubject { get; set; }
+    }
+
+    public class DeleteTheoreticalMaterialModel
+    {
+        public string chapterName { get; set; }
+        public string header { get; set; }
+        public string levelStuding { get; set; }
+        public string nameSubject { get; set; }
     }
 }

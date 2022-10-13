@@ -287,8 +287,8 @@ namespace webApiipAweb.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("award")
-                        .HasColumnType("float");
+                    b.Property<bool>("access")
+                        .HasColumnType("bit");
 
                     b.Property<int>("idSubject")
                         .HasColumnType("int");

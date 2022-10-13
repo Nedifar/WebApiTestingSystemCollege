@@ -76,14 +76,71 @@ namespace webApiipAweb.Controllers
                 {
                     return BadRequest("Данный раздел уже добавлен.");
                 }
-                var teoM = new List<Models.TheoreticalMaterial>();
-                foreach(var mm in model.theory)
-                {
-                    teoM.Add(new Models.TheoreticalMaterial { header = mm.header, content = mm.content });
-                }
-                selected.Chapters.Add(new Models.Chapter { award = model.award, Description = model.Description, name = model.name, TheoreticalMaterials = teoM});
-                context.SaveChanges();
+                selected.Chapters.Add(new Models.Chapter { Description = model.Description, name = model.name, access = model.access});
+                await context.SaveChangesAsync();
                 return Ok("Объект успешно создан.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("ChapterTheory")]
+        public async Task<ActionResult> AddTheoryForChapter(PostModels.CreatingTheoreticalMaterialModel teoM)
+        {
+            try
+            {
+                if (context.Subjects.Where(p => p.LevelStuding.nameLevel == teoM.levelStuding 
+                && p.nameSubject == teoM.nameSubject).FirstOrDefault() == null)
+                {
+                    return BadRequest("Данного класса, предмета не существует.");
+                }
+                var selected = context.Subjects.Where(p => p.LevelStuding.nameLevel == teoM.levelStuding && p.nameSubject == teoM.nameSubject).FirstOrDefault();
+                if (selected.Chapters.Where(p => p.name == teoM.chapterName).FirstOrDefault() == null)
+                {
+                    return BadRequest("Данного раздела не существует.");
+                }
+                var selectedChapter = selected.Chapters.Where(p => p.name == teoM.chapterName).FirstOrDefault();
+                if(selectedChapter.TheoreticalMaterials.Where(p=>p.header == teoM.header).FirstOrDefault() !=null)
+                {
+                    return BadRequest("Теоретический материал с данным заголовком уже существует.");
+                }
+                selectedChapter.TheoreticalMaterials.Add(new Models.TheoreticalMaterial { content = teoM.content, header = teoM.header });
+                await context.SaveChangesAsync();
+                return Ok("Объект успешно создан.");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("DeleteTheory")]
+        public async Task<ActionResult> DeleteTheoryForChapter(PostModels.DeleteTheoreticalMaterialModel teoM)
+        {
+            try
+            {
+                if (context.Subjects.Where(p => p.LevelStuding.nameLevel == teoM.levelStuding
+                && p.nameSubject == teoM.nameSubject).FirstOrDefault() == null)
+                {
+                    return BadRequest("Данного класса, предмета не существует.");
+                }
+                var selected = context.Subjects.Where(p => p.LevelStuding.nameLevel == teoM.levelStuding && p.nameSubject == teoM.nameSubject).FirstOrDefault();
+                if (selected.Chapters.Where(p => p.name == teoM.chapterName).FirstOrDefault() == null)
+                {
+                    return BadRequest("Данного раздела не существует.");
+                }
+                var selectedChapter = selected.Chapters.Where(p => p.name == teoM.chapterName).FirstOrDefault();
+                if (selectedChapter.TheoreticalMaterials.Where(p => p.header == teoM.header).FirstOrDefault() != null)
+                {
+                    return BadRequest("Теоретический материал с данным заголовком не существует.");
+                }
+                selectedChapter.TheoreticalMaterials.Remove(selectedChapter.TheoreticalMaterials.Where(p => p.header == teoM.header).FirstOrDefault());
+                await context.SaveChangesAsync();
+                return Ok("Объект успешно удален.");
             }
             catch (Exception ex)
             {

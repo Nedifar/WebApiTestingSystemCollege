@@ -88,7 +88,6 @@ namespace webApiipAweb.Controllers
                 {
                     Email = model.email,
                     levelStuding = model.levelStuding,
-                    PhoneNumber = model.telephone,
                     lastName = model.lastName,
                     firstName = model.firstName,
                 };
@@ -128,7 +127,7 @@ namespace webApiipAweb.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
@@ -389,7 +388,6 @@ namespace webApiipAweb.Controllers
         public string email { get; set; }
         public string pas { get; set; }
         public int levelStuding { get; set; }
-        public string telephone { get; set; }
         public string lastName { get; set; }
         public string firstName { get; set; }
     }

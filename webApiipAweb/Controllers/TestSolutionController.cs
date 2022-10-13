@@ -65,7 +65,7 @@ namespace webApiipAweb.Controllers
                 }
             }
             context.SaveChanges();
-            return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject }));
+            return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject}));
         }
 
         [HttpPost]
@@ -73,7 +73,7 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapters(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution).ToList();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter }));
+            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter, access = p.Chapter.access }));
         }
 
         [HttpPost]
@@ -81,7 +81,7 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapter(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToList();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter, getMaxProcentTest = p.getProcentChapterTest, getProcentDecideTaskWithOpen = p.getProcentChapterTask, TestPack= p.TestPackExecutions.Select(p=> new { TaskWithOpenAnsws = p.TaskWithOpenAnswsExecutions.Select(s => new { idExecTaskOpen = s.idTaskWithOpenAnswsExecution, status = s.status, serialNumber = p.TaskWithOpenAnswsExecutions.IndexOf(s) + 1, theme = s.TaskWithOpenAnsws.theme }) }) , theory = p.Chapter.TheoreticalMaterials }));
+            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter, getMaxProcentTest = p.getProcentChapterTest, getProcentDecideTaskWithOpen = p.getProcentChapterTask, TestPack= p.TestPackExecutions.Select(p=> new { TaskWithOpenAnsws = p.TaskWithOpenAnswsExecutions.Select(s => new { idExecTaskOpen = s.idTaskWithOpenAnswsExecution, status = s.status, serialNumber = p.TaskWithOpenAnswsExecutions.IndexOf(s) + 1, theme = s.TaskWithOpenAnsws.theme }) }) , theory = p.Chapter.TheoreticalMaterials, access = p.Chapter.access }));
         }
 
         [HttpPost]
