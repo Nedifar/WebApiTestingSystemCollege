@@ -61,6 +61,28 @@ namespace webApiipAweb.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("ChangeAccessChapter")]
+        public async Task<ActionResult> ChangeAccessChapter(PostModels.ChangeAccessChapterModel model)
+        {
+            try
+            {
+                if (context.Chapters.Where(p => p.name == model.nameChapter && p.Subject.LevelStuding.nameLevel == model.levelStuding).FirstOrDefault() == null)
+                {
+                    return BadRequest("Данного класса или раздела не существует.");
+                }
+                var changeableChapter = context.Chapters.Where(p => p.name == model.nameChapter && p.Subject.LevelStuding.nameLevel == model.levelStuding).FirstOrDefault();
+                changeableChapter.access = model.access;
+                await context.SaveChangesAsync();
+                return Ok("Изменения успешно зафиксированы.");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
         [Route("chapter")]
         public async Task<ActionResult> CreateChapter(PostModels.CreatingChapterModel model)
