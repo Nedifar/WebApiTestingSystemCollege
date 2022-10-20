@@ -141,3 +141,4 @@ C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\obj\Release\net5.0\webApi
 C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\obj\Release\net5.0\ref\webApiipAweb.dll
 C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\obj\Release\net5.0\webApiipAweb.pdb
 C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\obj\Release\net5.0\webApiipAweb.genruntimeconfig.cache
+C:\Users\Nedifar\source\repos\TestSystemAPI\webApiipAweb\bin\Release\net5.0\webApiipAweb.StaticWebAssets.xml

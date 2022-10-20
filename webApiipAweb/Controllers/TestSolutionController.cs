@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using webApiipAweb.Models;
 
 namespace webApiipAweb.Controllers
 {
@@ -167,7 +168,27 @@ namespace webApiipAweb.Controllers
             }
             else if (model.mode == "continue")
             {
-                return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault());
+                return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter).OrderByDescending(p => p.idTryingTestTask).Select(p => new
+                {
+                    TestTaskExecutions = p.TestTaskExecutions.Select(s => new
+                    {
+                        idTestTaskExecution = s.idTestTaskExecution,
+                        answearOnTask = s.AnswearOnTask == null ? null : new
+                        {
+                            idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
+                            text = s.AnswearOnTask.textAnswear
+                        },
+                        TestPack = new
+                        {
+                            s.TestTask.textQuestion,
+                            AnswearOnTasks = s.TestTask.AnswearOnTasks.Select(m => new
+                            {
+                                m.idAnswearOnTask,
+                                m.textAnswear
+                            })
+                        }
+                    })
+                }).FirstOrDefault());
             }
             else if (model.mode == "new")
             {
@@ -196,22 +217,61 @@ namespace webApiipAweb.Controllers
 
         [HttpPost]
         [Route("replytesttask")]
-        public async Task<ActionResult> ReplyTestTask(PostTestModels.BeginTestModel model)
+        public async Task<ActionResult> ReplyTestTask(ReplyTestTask model)
         {
-            return Ok();
+            var testtask = context.TestTaskExecutions.Where(p => p.idTestTaskExecution == model.idTestTaskExecution).FirstOrDefault();
+            testtask.AnswearOnTask = context.AnswearOnTasks.Where(p => p.idAnswearOnTask == model.idAnswearOnTask).FirstOrDefault();
+            context.SaveChanges();
+            if (testtask.AnswearOnTask.accuracy)
+            {
+                return Ok("Верно");
+            }
+            else
+            {
+                return Ok("Не верно");
+            }
+            
         }
 
         private async Task<ActionResult> BeginTestSecond(PostTestModels.BeginTestModel model)
         {
             var s = new Models.TryingTestTask { };
-            s.TestPackExecution.idChapterExecution = model.idExecChapter;
-            foreach (var vvv in context.ChapterExecutions.Where(p => p.idChapter == model.idExecChapter).FirstOrDefault().Chapter.TestPacks.Where(p=>p.header == model.testPackHeader).FirstOrDefault().TestTasks)
+            var ms = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idExecChapter).FirstOrDefault();
+            s.status = "Начат";
+            s.TestPackExecution = context.ChapterExecutions.Where(p=>p.idChapterExecution ==model.idExecChapter).FirstOrDefault().TestPackExecutions.FirstOrDefault();
+            foreach (var vvv in s.TestPackExecution.TestPack.TestTasks)
             {
                 s.TestTaskExecutions.Add(new Models.TestTaskExecution { TestTask = vvv });
             }
             context.TryingTestTasks.Add(s);
             context.SaveChanges();
-            return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault());
+            return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter).OrderByDescending(p => p.idTryingTestTask).Select(p => new
+            {
+                TestTaskExecutions = p.TestTaskExecutions.Select(s => new
+                {
+                    idTestTaskExecution = s.idTestTaskExecution,
+                    answearOnTask = s.AnswearOnTask==null?null:new
+                    {
+                        idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
+                        text = s.AnswearOnTask.textAnswear
+                    },
+                    TestPack = new
+                    {
+                        s.TestTask.textQuestion,
+                        AnswearOnTasks = s.TestTask.AnswearOnTasks.Select(m => new
+                        {
+                            m.idAnswearOnTask,
+                            m.textAnswear
+                        })
+                    }
+                })
+            }).FirstOrDefault());
         }
+    }
+
+    public class ReplyTestTask
+    {
+        public int idTestTaskExecution { get; set; }
+        public int idAnswearOnTask { get; set; }
     }
 }

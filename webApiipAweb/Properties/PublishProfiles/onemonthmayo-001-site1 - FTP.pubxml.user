@@ -8,24 +8,24 @@
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <EncryptedPassword />
     <_PublishTargetUrl>ftp://win8041.site4now.net:21/site1</_PublishTargetUrl>
-    <History>True|2022-10-15T13:22:15.4297419Z;False|2022-10-15T18:18:10.6684711+05:00;False|2022-10-15T18:18:05.7183589+05:00;True|2022-10-13T19:32:18.3434141+05:00;True|2022-10-13T19:05:25.5342466+05:00;</History>
+    <History>True|2022-10-20T18:28:36.7891296Z;True|2022-10-15T18:22:15.4297419+05:00;False|2022-10-15T18:18:10.6684711+05:00;False|2022-10-15T18:18:05.7183589+05:00;True|2022-10-13T19:32:18.3434141+05:00;True|2022-10-13T19:05:25.5342466+05:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
     <File Include="appsettings.Development.json">
-      <publishTime>10/15/2022 17:50:27</publishTime>
+      <publishTime>09/23/2022 17:02:37</publishTime>
     </File>
     <File Include="appsettings.json">
-      <publishTime>10/15/2022 17:50:27</publishTime>
+      <publishTime>09/23/2022 17:02:37</publishTime>
     </File>
     <File Include="BouncyCastle.Crypto.dll">
       <publishTime>10/19/2021 16:53:34</publishTime>
     </File>
     <File Include="Castle.Core.dll">
-      <publishTime>06/05/2020 16:02:04</publishTime>
+      <publishTime>05/06/2020 16:02:04</publishTime>
     </File>
     <File Include="MailKit.dll">
-      <publishTime>12/06/2022 07:12:44</publishTime>
+      <publishTime>06/12/2022 07:12:44</publishTime>
     </File>
     <File Include="Microsoft.AspNetCore.Cryptography.Internal.dll">
       <publishTime>04/16/2022 03:16:36</publishTime>
@@ -88,7 +88,7 @@
       <publishTime>10/19/2019 04:43:40</publishTime>
     </File>
     <File Include="MimeKit.dll">
-      <publishTime>12/06/2022 00:02:54</publishTime>
+      <publishTime>06/12/2022 00:02:54</publishTime>
     </File>
     <File Include="Newtonsoft.Json.Bson.dll">
       <publishTime>11/28/2018 04:10:18</publishTime>
@@ -157,22 +157,22 @@
       <publishTime>11/15/2019 13:37:42</publishTime>
     </File>
     <File Include="web.config">
-      <publishTime>10/15/2022 18:18:26</publishTime>
+      <publishTime>10/20/2022 23:24:48</publishTime>
     </File>
     <File Include="webApiipAweb.deps.json">
-      <publishTime>10/15/2022 18:18:26</publishTime>
+      <publishTime>10/20/2022 23:24:48</publishTime>
     </File>
     <File Include="webApiipAweb.dll">
-      <publishTime>10/15/2022 18:18:25</publishTime>
+      <publishTime>10/20/2022 23:24:19</publishTime>
     </File>
     <File Include="webApiipAweb.exe">
-      <publishTime>10/15/2022 18:18:25</publishTime>
+      <publishTime>10/20/2022 23:24:19</publishTime>
     </File>
     <File Include="webApiipAweb.pdb">
-      <publishTime>10/15/2022 18:18:25</publishTime>
+      <publishTime>10/20/2022 23:24:19</publishTime>
     </File>
     <File Include="webApiipAweb.runtimeconfig.json">
-      <publishTime>10/15/2022 18:14:32</publishTime>
+      <publishTime>10/20/2022 23:24:20</publishTime>
     </File>
   </ItemGroup>
 </Project>

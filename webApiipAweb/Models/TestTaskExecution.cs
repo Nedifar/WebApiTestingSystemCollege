@@ -18,7 +18,7 @@ namespace webApiipAweb.Models
         public int idTryingTestTask { get; set; }
         public virtual TryingTestTask TryingTestTask { get; set; }
         [ForeignKey("AnswearOnTask")]
-        public int idAnswearOnTask { get; set; }
+        public int? idAnswearOnTask { get; set; }
         public virtual AnswearOnTask AnswearOnTask { get; set; }
     }
 }

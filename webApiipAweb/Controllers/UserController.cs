@@ -65,7 +65,7 @@ namespace webApiipAweb.Controllers
                 }
                 else
                 {
-                    return NotFound();
+                    return NotFound("Неверный пароль");
                 }
             }
             catch
