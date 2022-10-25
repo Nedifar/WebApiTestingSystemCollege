@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,11 +17,13 @@ namespace webApiipAweb.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly IWebHostEnvironment _appEnvironment;
         private Models.context context;
         private readonly UserManager<Models.Child> _userManager;
         private readonly SignInManager<Models.Child> _signInManager;
-        public UserController(Models.context _context, UserManager<Models.Child> userManager, SignInManager<Models.Child> signInManager)
+        public UserController(Models.context _context, UserManager<Models.Child> userManager, SignInManager<Models.Child> signInManager, IWebHostEnvironment appEnvironment)
         {
+            _appEnvironment = appEnvironment;
             _userManager = userManager;
             _signInManager = signInManager;
             context = _context;
@@ -37,26 +41,26 @@ namespace webApiipAweb.Controllers
                 {
                     if (await _userManager.IsEmailConfirmedAsync(child))
                     {
-                        return Ok(context.Children.Where(p => p.Email == signPost.email).Select(p=> new 
-                        { 
-                            ChildId = p.Id, 
-                            firstName =  p.firstName, 
-                            lastName = p.lastName, 
-                            email =  p.Email, 
-                            levelStuding = p.levelStuding, 
-                            point= p.point,
-                            spendPoint =  p.spendPoint,
+                        return Ok(context.Children.Where(p => p.Email == signPost.email).Select(p => new
+                        {
+                            ChildId = p.Id,
+                            firstName = p.firstName,
+                            lastName = p.lastName,
+                            email = p.Email,
+                            levelStuding = p.levelStuding,
+                            point = p.point,
+                            spendPoint = p.spendPoint,
                             Appeals = p.Appeals.Select(s => new
                             {
-                                date =  s.dateAppeal,
+                                date = s.dateAppeal,
                                 idAppeal = s.idAppeal,
                                 inArchive = s.inArchive,
                                 status = s.status,
-                                textAppeal =  s.textAppeal,
-                                type =  s.TypeAppeal.typeName
+                                textAppeal = s.textAppeal,
+                                type = s.TypeAppeal.typeName
                             }),
-                            image = p.imagePath
-                        }).FirstOrDefault());
+                            image = Convert.ToBase64String(System.IO.File.ReadAllBytes(p.getRelevantPathImage))
+                        }).FirstOrDefault()); 
                     }
                     else
                     {
@@ -78,13 +82,14 @@ namespace webApiipAweb.Controllers
         [Route("reg")]
         public async Task<ActionResult> Registration(RegPost model)
         {
+            var ch = new Models.Child();
             try
             {
                 if(context.Users.Where(p=>p.Email == model.email).Count() !=0)
                 {
                     return BadRequest("Данный email уже используется.");
                 }
-                var ch = new Models.Child
+                ch = new Models.Child
                 {
                     Email = model.email,
                     levelStuding = model.levelStuding,
@@ -127,6 +132,7 @@ namespace webApiipAweb.Controllers
             }
             catch(Exception ex)
             {
+                await _userManager.DeleteAsync(ch);
                 return BadRequest(ex.Message);
             }
         }
@@ -144,16 +150,20 @@ namespace webApiipAweb.Controllers
                 {
                     if (profileModel.base64image != null || !String.IsNullOrWhiteSpace(profileModel.base64image))
                     {
-                        var content = new MultipartFormDataContent();
-                        content.Add(new StringContent(profileModel.base64image), "source");
-                        var request = await hhtp.PostAsync("https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a5&format=json", content);
-                        request.EnsureSuccessStatusCode();
-                        var res = request.Content.ReadAsAsync<PostModels.Rootobject>().Result;
-                        result.imagePath = res.image.url;
+                        try
+                        {
+                            var bytes = Convert.FromBase64String(profileModel.base64image);
+                            using (var imageFile = new FileStream($"{AppDomain.CurrentDomain.BaseDirectory}images/img{profileModel.idUser}.jpeg", FileMode.Create))
+                            {
+                                imageFile.Write(bytes, 0, bytes.Length);
+                                imageFile.Flush();
+                                result.imagePath = $"images/img{profileModel.idUser}.jpeg";
+                            }
+                        }
+                        catch { return BadRequest("Проблемы с добавлением изображения."); }
                     }
                     result.firstName = profileModel.firstName;
                     result.lastName = profileModel.lastName;
-                    result.PhoneNumber = profileModel.phone;
                     result.levelStuding = profileModel.levelStuding;
                     if(result.LevelStudingExecutions.Where(p=>p.LevelStuding.nameLevel == result.levelStuding.ToString()).FirstOrDefault() ==null)
                     {
@@ -410,10 +420,8 @@ namespace webApiipAweb.Controllers
     {
         public string idUser { get; set; }
         public int levelStuding { get; set; }
-        public string phone { get; set; }
         public string base64image { get; set; }
         public string lastName { get; set; }
         public string firstName { get; set; }
-        public string middleName { get; set; }
     }
 }

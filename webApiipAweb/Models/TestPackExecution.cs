@@ -18,6 +18,24 @@ namespace webApiipAweb.Models
         public int idTestPack { get; set; }
         public virtual TestPack TestPack { get; set; }
         public virtual List<TryingTestTask> TryingTestTasks { get; set; } = new List<TryingTestTask>();
+        public int accessProcentFinalTest
+        {
+            get
+            {
+                return getProcentDecideTaskWithOpen;
+            }
+        }
+        public bool haveFinalTest
+        {
+            get
+            {
+                if(TestPack.TestTasks.Count() !=0)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
         public virtual List<TaskWithOpenAnswsExecution> TaskWithOpenAnswsExecutions { get; set; } = new List<TaskWithOpenAnswsExecution>();
         public int getMaxProcentTest
         {
@@ -27,7 +45,7 @@ namespace webApiipAweb.Models
                 {
                     return 0;
                 }
-                return TryingTestTasks.Max(p => p.result);
+                return 100 * TryingTestTasks.Max(p => p.result) / TestPack.TestTasks.Count();
             }
         }
         public int getProcentDecideTaskWithOpen

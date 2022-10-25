@@ -21,6 +21,16 @@ namespace webApiipAweb.Models
         public double spendPoint { get; set; }
         public string passRecoveryCode { get; set; }
         public string imagePath { get; set; }
+        public string getRelevantPathImage
+        {
+            get
+            {
+                if(imagePath != null)
+                return AppDomain.CurrentDomain.BaseDirectory + imagePath;
+                else
+                    return null;
+            }
+        }
         public virtual List<ThingPackExecution> ThingPackExecutions { get; set; } = new List<ThingPackExecution>();
         public virtual List<AchivmentExecution> AchivmentExecutions { get; set; } = new List<AchivmentExecution>();
         public virtual List<LevelStudingExecution> LevelStudingExecutions { get; set; } = new List<LevelStudingExecution>();

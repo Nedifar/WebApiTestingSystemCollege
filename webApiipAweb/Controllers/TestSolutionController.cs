@@ -66,7 +66,7 @@ namespace webApiipAweb.Controllers
                 }
             }
             context.SaveChanges();
-            return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject}));
+            return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject }));
         }
 
         [HttpPost]
@@ -74,7 +74,7 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapters(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution).ToList();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter, access = p.Chapter.access }));
+            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, getProcentChapterDecide = p.getProcentChapter, getMaxProcentTest = p.getProcentChapterTest, getProcentDecideTaskWithOpen = p.getProcentChapterTask, idExec = p.idChapterExecution, access = p.Chapter.access }));
         }
 
         [HttpPost]
@@ -82,7 +82,7 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapter(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToList();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter, getMaxProcentTest = p.getProcentChapterTest, getProcentDecideTaskWithOpen = p.getProcentChapterTask, TestPack= p.TestPackExecutions.Select(p=> new { TaskWithOpenAnsws = p.TaskWithOpenAnswsExecutions.Select(s => new { idExecTaskOpen = s.idTaskWithOpenAnswsExecution, status = s.status, serialNumber = p.TaskWithOpenAnswsExecutions.IndexOf(s) + 1, theme = s.TaskWithOpenAnsws.theme }) }) , theory = p.Chapter.TheoreticalMaterials, access = p.Chapter.access }));
+            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter, getMaxProcentTest = p.getProcentChapterTest, getProcentDecideTaskWithOpen = p.getProcentChapterTask, TestPack = p.TestPackExecutions.Select(p => new {Header = p.TestPack.header, haveFinalTest=p.haveFinalTest, accessFinalTest = p.accessProcentFinalTest, TaskWithOpenAnsws = p.TaskWithOpenAnswsExecutions.Select(s => new { idExecTaskOpen = s.idTaskWithOpenAnswsExecution, status = s.status, serialNumber = p.TaskWithOpenAnswsExecutions.IndexOf(s) + 1, theme = s.TaskWithOpenAnsws.theme }) }), theory = p.Chapter.TheoreticalMaterials, access = p.Chapter.access }));
         }
 
         [HttpPost]
@@ -125,7 +125,7 @@ namespace webApiipAweb.Controllers
             try
             {
                 var s = context.TaskWithOpenAnswsExecutions.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).ToList();
-                if(s.Where(p=>p.TaskWithOpenAnsws.theme == model.theme).FirstOrDefault()==null)
+                if (s.Where(p => p.TaskWithOpenAnsws.theme == model.theme).FirstOrDefault() == null)
                 {
                     return BadRequest("Неверная тематика.");
                 }
@@ -194,7 +194,13 @@ namespace webApiipAweb.Controllers
             {
                 var m = context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault();
                 m.status = "Завершен";
-                m.result = m.TestTaskExecutions.Count(p => p.AnswearOnTask.accuracy);
+                m.result = m.TestTaskExecutions.Count(p =>
+                {
+                    if (p.AnswearOnTask != null)
+                        return p.AnswearOnTask.accuracy;
+                    else
+                        return false;
+                });
                 context.SaveChanges();
                 return await BeginTestSecond(model);
             }
@@ -208,11 +214,24 @@ namespace webApiipAweb.Controllers
         [Route("endtest")]
         public async Task<ActionResult> EndTest(PostTestModels.BeginTestModel model)
         {
-            var m = context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault();
-            m.status = "Завершен";
-            m.result = m.TestTaskExecutions.Count(p => p.AnswearOnTask.accuracy);
-            context.SaveChanges();
-            return Ok();
+            try
+            {
+                var m = context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault();
+                m.status = "Завершен";
+                m.result = m.TestTaskExecutions.Count(p =>
+                {
+                    if (p.AnswearOnTask != null)
+                        return p.AnswearOnTask.accuracy;
+                    else
+                        return false;
+                });
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok("Тест успешно завершен.");
         }
 
         [HttpPost]
@@ -230,7 +249,7 @@ namespace webApiipAweb.Controllers
             {
                 return Ok("Не верно");
             }
-            
+
         }
 
         private async Task<ActionResult> BeginTestSecond(PostTestModels.BeginTestModel model)
@@ -238,7 +257,7 @@ namespace webApiipAweb.Controllers
             var s = new Models.TryingTestTask { };
             var ms = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idExecChapter).FirstOrDefault();
             s.status = "Начат";
-            s.TestPackExecution = context.ChapterExecutions.Where(p=>p.idChapterExecution ==model.idExecChapter).FirstOrDefault().TestPackExecutions.FirstOrDefault();
+            s.TestPackExecution = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idExecChapter).FirstOrDefault().TestPackExecutions.FirstOrDefault();
             foreach (var vvv in s.TestPackExecution.TestPack.TestTasks)
             {
                 s.TestTaskExecutions.Add(new Models.TestTaskExecution { TestTask = vvv });
@@ -250,7 +269,7 @@ namespace webApiipAweb.Controllers
                 TestTaskExecutions = p.TestTaskExecutions.Select(s => new
                 {
                     idTestTaskExecution = s.idTestTaskExecution,
-                    answearOnTask = s.AnswearOnTask==null?null:new
+                    answearOnTask = s.AnswearOnTask == null ? null : new
                     {
                         idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
                         text = s.AnswearOnTask.textAnswear
