@@ -31,11 +31,13 @@ namespace webApiipAweb.Models
         public DbSet<LevelStudingExecution> LevelStudingExecutions { get; set; }
         public DbSet<SubjectExecution> SubjectExecutions { get; set; }
         public DbSet<TaskWithOpenAnsw> TaskWithOpenAnsws { get; set; }
+        public DbSet<TaskWithClosedAnsw> TaskWithClosedAnsw { get; set; }
         public DbSet<TestTask> TestTasks { get; set; }
         public DbSet<TestTaskExecution> TestTaskExecutions { get; set; }
         public DbSet<TryingTestTask> TryingTestTasks { get; set; }
         public DbSet<Solution> Solutions { get; set; }
         public DbSet<TaskWithOpenAnswsExecution> TaskWithOpenAnswsExecutions { get; set; }
+        public DbSet<TaskWithClosedAnswsExecution> TaskWithClosedAnswsExecutions { get; set; }
         public DbSet<Appeal> Appeals { get; set; }
         public DbSet<TypeAppeal> TypeAppeals { get; set; }
         public DbSet<TestPack> TestPacks { get; set; }

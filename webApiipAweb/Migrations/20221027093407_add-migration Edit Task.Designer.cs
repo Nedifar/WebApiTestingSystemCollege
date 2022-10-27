@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webApiipAweb.Models;
 
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    partial class contextModelSnapshot : ModelSnapshot
+    [Migration("20221027093407_add-migration Edit Task")]
+    partial class addmigrationEditTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -460,7 +462,7 @@ namespace webApiipAweb.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("TaskWithClosedAnswidTask")
+                    b.Property<int?>("TaskWithClosedAnswidTaskWithOpenAnsw")
                         .HasColumnType("int");
 
                     b.Property<int>("idTaskWithOpenAnsw")
@@ -471,7 +473,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasKey("idSolution");
 
-                    b.HasIndex("TaskWithClosedAnswidTask");
+                    b.HasIndex("TaskWithClosedAnswidTaskWithOpenAnsw");
 
                     b.HasIndex("idTaskWithOpenAnsw");
 
@@ -522,7 +524,7 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithClosedAnsw", b =>
                 {
-                    b.Property<int>("idTask")
+                    b.Property<int>("idTaskWithOpenAnsw")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -542,7 +544,7 @@ namespace webApiipAweb.Migrations
                     b.Property<string>("theme")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("idTask");
+                    b.HasKey("idTaskWithOpenAnsw");
 
                     b.HasIndex("idTestPack");
 
@@ -551,7 +553,7 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithClosedAnswsExecution", b =>
                 {
-                    b.Property<int>("idTaskExecution")
+                    b.Property<int>("idTaskWithOpenAnswsExecution")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -559,7 +561,7 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TaskWithClosedAnswidTask")
+                    b.Property<int?>("TaskWithClosedAnswidTaskWithOpenAnsw")
                         .HasColumnType("int");
 
                     b.Property<int?>("idAnswearOnTask")
@@ -574,9 +576,9 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("timeExecutionInSecond")
                         .HasColumnType("int");
 
-                    b.HasKey("idTaskExecution");
+                    b.HasKey("idTaskWithOpenAnswsExecution");
 
-                    b.HasIndex("TaskWithClosedAnswidTask");
+                    b.HasIndex("TaskWithClosedAnswidTaskWithOpenAnsw");
 
                     b.HasIndex("idAnswearOnTask");
 
@@ -587,7 +589,7 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithOpenAnsw", b =>
                 {
-                    b.Property<int>("idTask")
+                    b.Property<int>("idTaskWithOpenAnsw")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -610,7 +612,7 @@ namespace webApiipAweb.Migrations
                     b.Property<string>("theme")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("idTask");
+                    b.HasKey("idTaskWithOpenAnsw");
 
                     b.HasIndex("idTestPack");
 
@@ -619,7 +621,7 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithOpenAnswsExecution", b =>
                 {
-                    b.Property<int>("idTaskExecution")
+                    b.Property<int>("idTaskWithOpenAnswsExecution")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -630,7 +632,7 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TaskWithOpenAnswidTask")
+                    b.Property<int?>("TaskWithOpenAnswidTaskWithOpenAnsw")
                         .HasColumnType("int");
 
                     b.Property<int?>("idTask")
@@ -642,9 +644,9 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("timeExecutionInSecond")
                         .HasColumnType("int");
 
-                    b.HasKey("idTaskExecution");
+                    b.HasKey("idTaskWithOpenAnswsExecution");
 
-                    b.HasIndex("TaskWithOpenAnswidTask");
+                    b.HasIndex("TaskWithOpenAnswidTaskWithOpenAnsw");
 
                     b.HasIndex("idTestPackExecution");
 
@@ -1075,7 +1077,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.TaskWithClosedAnsw", null)
                         .WithMany("Solutions")
-                        .HasForeignKey("TaskWithClosedAnswidTask");
+                        .HasForeignKey("TaskWithClosedAnswidTaskWithOpenAnsw");
 
                     b.HasOne("webApiipAweb.Models.TaskWithOpenAnsw", "TaskWithOpenAnsw")
                         .WithMany("Solutions")
@@ -1127,7 +1129,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.TaskWithClosedAnsw", "TaskWithClosedAnsw")
                         .WithMany()
-                        .HasForeignKey("TaskWithClosedAnswidTask");
+                        .HasForeignKey("TaskWithClosedAnswidTaskWithOpenAnsw");
 
                     b.HasOne("webApiipAweb.Models.AnswearOnTask", "AnswearOnTask")
                         .WithMany()
@@ -1157,7 +1159,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.TaskWithOpenAnsw", "TaskWithOpenAnsw")
                         .WithMany()
-                        .HasForeignKey("TaskWithOpenAnswidTask");
+                        .HasForeignKey("TaskWithOpenAnswidTaskWithOpenAnsw");
 
                     b.HasOne("webApiipAweb.Models.TestPackExecution", "TestPackExecution")
                         .WithMany("TaskWithOpenAnswsExecutions")

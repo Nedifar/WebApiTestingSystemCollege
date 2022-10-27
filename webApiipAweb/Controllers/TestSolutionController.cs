@@ -56,16 +56,24 @@ namespace webApiipAweb.Controllers
                         var packexec = chapexec.TestPackExecutions.Where(p => p.idTestPack == mod4.idTestPack).FirstOrDefault();
                         foreach (var mod3 in mod4.TaskWithOpenAnsws)
                         {
-                            if (packexec.TaskWithOpenAnswsExecutions.Where(p => p.idTaskWithOpenAnsws == mod3.idTaskWithOpenAnsw).FirstOrDefault() == null)
+                            if (packexec.TaskWithOpenAnswsExecutions.Where(p => p.idTask == mod3.idTask).FirstOrDefault() == null) //???
                             {
-                                packexec.TaskWithOpenAnswsExecutions.Add(new Models.TaskWithOpenAnswsExecution { TaskWithOpenAnsws = mod3, status = "Ожидает решения" });
+                                packexec.TaskWithOpenAnswsExecutions.Add(new Models.TaskWithOpenAnswsExecution { TaskWithOpenAnsw = mod3, Status = StatusTaskExecution.AwaitingExecution });
                             }
-                            var taskexec = packexec.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsws == mod3).FirstOrDefault();
+                            var taskexec = packexec.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw == mod3).FirstOrDefault();
+                        }
+                        foreach (var mod3 in mod4.TaskWithClosedAnsws)
+                        {
+                            if (packexec.TaskWithClosedAnswsExecutions.Where(p => p.idTask == mod3.idTask).FirstOrDefault() == null) //???
+                            {
+                                packexec.TaskWithClosedAnswsExecutions.Add(new Models.TaskWithClosedAnswsExecution { TaskWithClosedAnsw = mod3, Status = StatusTaskExecution.AwaitingExecution });
+                            }
+                            var taskexec = packexec.TaskWithClosedAnswsExecutions.Where(p => p.TaskWithClosedAnsw == mod3).FirstOrDefault();
                         }
                     }
                 }
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject }));
         }
 
@@ -82,7 +90,27 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapter(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToList();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, idExec = p.idChapterExecution, getProcentChapterDecide = p.getProcentChapter, getMaxProcentTest = p.getProcentChapterTest, getProcentDecideTaskWithOpen = p.getProcentChapterTask, TestPack = p.TestPackExecutions.Select(p => new {Header = p.TestPack.header, haveFinalTest=p.haveFinalTest, accessFinalTest = p.accessProcentFinalTest, TaskWithOpenAnsws = p.TaskWithOpenAnswsExecutions.Select(s => new { idExecTaskOpen = s.idTaskWithOpenAnswsExecution, status = s.status, serialNumber = p.TaskWithOpenAnswsExecutions.IndexOf(s) + 1, theme = s.TaskWithOpenAnsws.theme }) }), theory = p.Chapter.TheoreticalMaterials, access = p.Chapter.access }));
+            return Ok(s.Select(p => new
+            { 
+                NameChapter = p.Chapter.name, 
+                Description = p.Chapter.Description, 
+                idExec = p.idChapterExecution, 
+                getProcentChapterDecide = p.getProcentChapter,
+                getMaxProcentTest = p.getProcentChapterTest, 
+                getProcentDecideTaskWithOpen = p.getProcentChapterTask, 
+                TestPack = p.TestPackExecutions.Select(p => new
+                {
+                    Header = p.TestPack.header,
+                    haveFinalTest = p.haveFinalTest,
+                    accessFinalTest = p.accessProcentFinalTest,
+                    Tasks = p.GetTasksExecution().Select(l => new
+                    {
+                        Task = l,
+                        serialNumber = p.GetTasksExecution().IndexOf(l) + 1
+                    })
+                }), 
+                theory = p.Chapter.TheoreticalMaterials, 
+                access = p.Chapter.access }));
         }
 
         [HttpPost]
@@ -91,9 +119,37 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                var s = context.TaskWithOpenAnswsExecutions.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.headerTestPack).ToList();
-                var mod = s[model.serialNumber - 1];
-                return Ok(new { serialNumber = model.serialNumber, answear = mod.TaskWithOpenAnsws.answear, question = mod.TaskWithOpenAnsws.textQuestion, solution = mod.TaskWithOpenAnsws.Solutions.Select(s => new { url = s.url }) });
+                var s = context.TestPackExecutions.Where(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack).FirstOrDefault();
+                var closed = s.TaskWithClosedAnswsExecutions.Where(p => p.TaskWithClosedAnsw.numericInPack == model.serialNumber).FirstOrDefault();
+                var opened = s.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber).FirstOrDefault();
+                if (closed is not null)
+                {
+                    return Ok(new
+                    {
+                        serialNumber = model.serialNumber,
+                        selectedAnswear = closed.AnswearOnTask.idAnswearOnTask,
+                        Answears = closed.TaskWithClosedAnsw.AnswearOnTask.Select(p => new
+                        {
+                            text = p.textAnswear,
+                            idAnswear = p.idAnswearOnTask
+                        }),
+                        status = closed.GetStatus()
+                    });
+                }
+                
+                else if(opened is not null)
+                {
+                    return Ok(new
+                    {
+                        serialNumber = model.serialNumber,
+                        selectedAnswear = opened.AnswearResult,
+                        status = closed.GetStatus()
+                    });
+                }
+                else
+                {
+                    return BadRequest("Что-то не так.");
+                }
             }
             catch
             {
@@ -105,50 +161,76 @@ namespace webApiipAweb.Controllers
         [Route("ReplyTaskOpenOnNumber")]
         public async Task<ActionResult> ReplyTaskOpenOnNumber(PostModels.ReplyTaskOpenOnNumberPost model)
         {
-            var s = context.TaskWithOpenAnswsExecutions.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).ToList();
-            var mod = s[model.serialNumber - 1];
-            if (mod.TaskWithOpenAnsws.answear.ToLower().Trim() == model.answear.ToLower().Trim())
+            var s = context.TaskWithOpenAnswsExecutions
+                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                && p.TestPackExecution.TestPack.header == model.testPackHeader 
+                && p.TaskWithOpenAnsw.numericInPack == model.serialNumber)
+                .FirstOrDefault();
+            s.AnswearResult = model.answear;
+            if (s.TaskWithOpenAnsw.answear.ToLower().Trim() == model.answear.ToLower().Trim())
             {
-                mod.status = "Решено верно.";
-                context.SaveChanges();
+                s.Status = StatusTaskExecution.Correct;
+                await context.SaveChangesAsync();
                 return Ok("Ответ верный.");
             }
-            mod.status = "Решено неверно.";
-            context.SaveChanges();
+            s.Status = StatusTaskExecution.InCorrect;
+            await context.SaveChangesAsync();
             return BadRequest("Ответ неверный");
         }
 
         [HttpPost]
-        [Route("GetNextTaskOpenOnNumber")]
-        public async Task<ActionResult> GetNextTaskOpenOnNumber(PostTestModels.GetNextTaskOpenOnNumberPost model)
+        [Route("ReplyTaskOpenOnNumber")]
+        public async Task<ActionResult> ReplyTaskOpenOnNumber(PostModels.ReplyTaskClosedOnNumberPost model)
         {
-            try
+            ///Добавь сюда сохарнеие результата без зависимости от правильности
+            var s = context.TaskWithClosedAnswsExecutions
+                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                && p.TestPackExecution.TestPack.header == model.testPackHeader 
+                && p.TaskWithClosedAnsw.numericInPack == model.serialNumber)
+                .FirstOrDefault();
+            s.AnswearOnTask = context.AnswearOnTasks.Where(p => p.idAnswearOnTask == model.idAnswear).FirstOrDefault();
+            if (s.TaskWithClosedAnsw.AnswearOnTask.Where(p=>p.accuracy).FirstOrDefault().idAnswearOnTask == model.idAnswear)
             {
-                var s = context.TaskWithOpenAnswsExecutions.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).ToList();
-                if (s.Where(p => p.TaskWithOpenAnsws.theme == model.theme).FirstOrDefault() == null)
-                {
-                    return BadRequest("Неверная тематика.");
-                }
-                Models.TaskWithOpenAnswsExecution mod = new Models.TaskWithOpenAnswsExecution();
-                if (model.theme != null)
-                {
-                    for (int i = model.currentSerialNumber; i < s.Count; i++)
-                    {
-                        if (s[i].TaskWithOpenAnsws.theme == model.theme)
-                            mod = s[i];
-                    }
-                    if (mod.idTaskWithOpenAnswsExecution == 0)
-                    { return BadRequest("Задания по данной тематике закончились."); }
-                }
-                else
-                    mod = s[model.currentSerialNumber];
-                return Ok(new { serialNumber = model.currentSerialNumber + 1, answear = mod.TaskWithOpenAnsws.answear, question = mod.TaskWithOpenAnsws.textQuestion, solution = mod.TaskWithOpenAnsws.Solutions.Select(s => new { url = s.url }) });
+                s.Status = StatusTaskExecution.Correct;
+                await context.SaveChangesAsync();
+                return Ok("Ответ верный.");
             }
-            catch
-            {
-                return BadRequest("Неверный серийный номер или тематика.");
-            }
+            s.Status = StatusTaskExecution.InCorrect;
+            await context.SaveChangesAsync();
+            return BadRequest("Ответ неверный");
         }
+
+        //[HttpPost]
+        //[Route("GetNextTaskOpenOnNumber")]
+        //public async Task<ActionResult> GetNextTaskOpenOnNumber(PostTestModels.GetNextTaskOpenOnNumberPost model)
+        //{
+        //    try
+        //    {
+        //        var s = context.TaskWithOpenAnswsExecutions.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).ToList();
+        //        if (s.Where(p => p.TaskWithOpenAnsws.theme == model.theme).FirstOrDefault() == null)
+        //        {
+        //            return BadRequest("Неверная тематика.");
+        //        }
+        //        Models.TaskWithOpenAnswsExecution mod = new Models.TaskWithOpenAnswsExecution();
+        //        if (model.theme != null)
+        //        {
+        //            for (int i = model.currentSerialNumber; i < s.Count; i++)
+        //            {
+        //                if (s[i].TaskWithOpenAnsws.theme == model.theme)
+        //                    mod = s[i];
+        //            }
+        //            if (mod.idTaskWithOpenAnswsExecution == 0)
+        //            { return BadRequest("Задания по данной тематике закончились."); }
+        //        }
+        //        else
+        //            mod = s[model.currentSerialNumber];
+        //        return Ok(new { serialNumber = model.currentSerialNumber + 1, answear = mod.TaskWithOpenAnsws.answear, question = mod.TaskWithOpenAnsws.textQuestion, solution = mod.TaskWithOpenAnsws.Solutions.Select(s => new { url = s.url }) });
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest("Неверный серийный номер или тематика.");
+        //    }
+        //}
 
         [HttpPost]
         [Route("begintest")]
@@ -263,7 +345,7 @@ namespace webApiipAweb.Controllers
                 s.TestTaskExecutions.Add(new Models.TestTaskExecution { TestTask = vvv });
             }
             context.TryingTestTasks.Add(s);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter).OrderByDescending(p => p.idTryingTestTask).Select(p => new
             {
                 TestTaskExecutions = p.TestTaskExecutions.Select(s => new

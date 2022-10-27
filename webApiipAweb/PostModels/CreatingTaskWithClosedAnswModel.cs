@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace webApiipAweb.PostModels
 {
-    public class CreatingTaskWithOpenAnswModel
+    public class CreatingTaskWithClosedAnswModel
     {
         public string textQuestion { get; set; }
+        public virtual List<CreatingAnswearOnTaskModel> CreatingAnswearOnTaskModels { get; set; } = new List<CreatingAnswearOnTaskModel>();
         public string levelStuding { get; set; }
         public string subjectName { get; set; }
-        public string chapter { get; set; }
-        public string answear { get; set; }
-        public string theme { get; set; }
+        public string chapterName { get; set; }
         public string testPackHeader { get; set; }
+        public string theme { get; set; }
         public virtual List<CreatingSolutionModel> CreatingSolutionModels { get; set; } = new List<CreatingSolutionModel>();
     }
 }

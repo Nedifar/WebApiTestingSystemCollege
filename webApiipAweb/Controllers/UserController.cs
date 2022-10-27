@@ -55,7 +55,7 @@ namespace webApiipAweb.Controllers
                                 date = s.dateAppeal,
                                 idAppeal = s.idAppeal,
                                 inArchive = s.inArchive,
-                                status = s.status,
+                                status = s.status.ToString(),
                                 textAppeal = s.textAppeal,
                                 type = s.TypeAppeal.typeName
                             }),
@@ -334,7 +334,7 @@ namespace webApiipAweb.Controllers
             {
                 return BadRequest("Данного типа обращения не существует");
             }
-            child.Appeals.Add(new Models.Appeal { dateAppeal = DateTime.Now, status = Models.Status.InProcessing, TypeAppeal = type });
+            child.Appeals.Add(new Models.Appeal { dateAppeal = DateTime.Now, status = Models.Status.InProcessing, TypeAppeal = type, textAppeal=model.textAppeal });
             context.SaveChanges();
             return Ok("Успешно");
         }

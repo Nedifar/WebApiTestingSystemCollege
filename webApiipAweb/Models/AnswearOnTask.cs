@@ -14,7 +14,10 @@ namespace webApiipAweb.Models
         public string textAnswear { get; set; }
         public bool accuracy { get; set; }
         [ForeignKey("TestTask")]
-        public int idTestTask { get; set; }
+        public int? idTestTask { get; set; }
         public virtual TestTask TestTask { get; set; }
+        [ForeignKey("TaskWithClosedAnsw")]
+        public int? idTask { get; set; }
+        public virtual TaskWithClosedAnsw TaskWithClosedAnsw { get; set; }
     }
 }

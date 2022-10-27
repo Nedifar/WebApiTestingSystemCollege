@@ -8,18 +8,58 @@ using System.Threading.Tasks;
 
 namespace webApiipAweb.Models
 {
-    public class TaskWithOpenAnswsExecution
+    public class TaskExecutionParent
     {
         [Key]
-        public int idTaskWithOpenAnswsExecution { get; set; }
+        public int idTaskExecution { get; set; }
+
         [ForeignKey("TestPackExecution")]
         public int? idTestPackExecution { get; set; }
+
         [JsonIgnore]
         public virtual TestPackExecution TestPackExecution { get; set; }
-        [ForeignKey("TaskWithOpenAnsws")]
-        public int? idTaskWithOpenAnsws { get; set; }
-        public virtual TaskWithOpenAnsw TaskWithOpenAnsws { get; set; }
-        public string status { get; set; }
+
+
+        public StatusTaskExecution Status { get; set; }
+
         public int timeExecutionInSecond { get; set; }
+
+        public string GetStatus() => this.Status switch
+        {
+            StatusTaskExecution.AwaitingExecution => "Ожидает выполнения",
+            StatusTaskExecution.InCorrect => "Решено неверно",
+            StatusTaskExecution.Correct => "Решено верно",
+            _ => throw new Exception()
+        };
+    }
+
+    public class TaskWithOpenAnswsExecution : TaskExecutionParent
+    {
+        public string AnswearResult { get; set; }
+
+        [ForeignKey("TaskWithOpenAnsws")]
+        public int? idTask { get; set; }
+
+        public virtual TaskWithOpenAnsw TaskWithOpenAnsw { get; set; }
+    }
+
+    public class TaskWithClosedAnswsExecution : TaskExecutionParent
+    {
+        [ForeignKey("AnswearOnTask")]
+        public int? idAnswearOnTask { get; set; }
+
+        public virtual AnswearOnTask AnswearOnTask { get; set; }
+
+        [ForeignKey("TaskWithOpenAnsws")]
+        public int? idTask { get; set; }
+
+        public virtual TaskWithClosedAnsw TaskWithClosedAnsw { get; set; }
+    }
+
+    public enum StatusTaskExecution
+    {
+        AwaitingExecution,
+        Correct,
+        InCorrect
     }
 }

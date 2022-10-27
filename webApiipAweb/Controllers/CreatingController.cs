@@ -231,7 +231,7 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if (context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault() == null)
+                if (context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName && p.name == model.chapter).FirstOrDefault() == null)
                 {
                     return BadRequest("Данного класса, предмета или раздела не существует.");
                 }
@@ -254,6 +254,48 @@ namespace webApiipAweb.Controllers
                     return BadRequest("Данной тестовой коллекции не существует.");
                 }
                 selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TaskWithOpenAnsws.Add(testTask);
+                context.SaveChanges();
+                return Ok("Объект успешно создан.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("TaskWithClosedAnswear")]
+        public async Task<ActionResult> CreateTaskWithClosedAnswear(PostModels.CreatingTaskWithClosedAnswModel model)
+        {
+            try
+            {
+                if (context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName && p.name == model.chapterName).FirstOrDefault() == null)
+                {
+                    return BadRequest("Данного класса, предмета или раздела не существует.");
+                }
+                var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
+                var testTask = new Models.TaskWithClosedAnsw { textQuestion = model.textQuestion, theme = model.theme };
+                foreach (var mod in model.CreatingSolutionModels)
+                {
+                    using (var hhtp = new HttpClient())
+                    {
+                        var content = new MultipartFormDataContent();
+                        content.Add(new StringContent(mod.base64image), "source");
+                        var request = await hhtp.PostAsync("https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a5&format=json", content);
+                        request.EnsureSuccessStatusCode();
+                        var res = request.Content.ReadAsAsync<PostModels.Rootobject>().Result;
+                        testTask.Solutions.Add(new Models.Solution { url = res.image.url });
+                    }
+                }
+                foreach (var mod in model.CreatingAnswearOnTaskModels)
+                {
+                    testTask.AnswearOnTask.Add(new Models.AnswearOnTask { accuracy = mod.accuracy, textAnswear = mod.textAnswear });
+                }
+                if (selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault() == null)
+                {
+                    return BadRequest("Данной тестовой коллекции не существует.");
+                }
+                selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TaskWithClosedAnsws.Add(testTask);
                 context.SaveChanges();
                 return Ok("Объект успешно создан.");
             }

@@ -8,17 +8,21 @@ using System.Threading.Tasks;
 
 namespace webApiipAweb.Models
 {
-    public class TaskWithOpenAnsw
+    public class TaskWithOpenAnsw : ParentTask
     {
-        [Key]
-        public int idTaskWithOpenAnsw { get; set; }
-        public string textQuestion { get; set; }
+        public TaskWithOpenAnsw()
+        {
+            TypesTask = TypesTask.Opened;
+        }
         public string answear { get; set; }
-        public string theme { get; set; }
-        [ForeignKey("TestPack")]
-        public int? idTestPack { get; set; }
-        [JsonIgnore]
-        public virtual TestPack TestPack { get; set; }
-        public virtual List<Solution> Solutions { get; set; } = new List<Solution>();
+    }
+
+    public class TaskWithClosedAnsw : ParentTask
+    {
+        public TaskWithClosedAnsw()
+        {
+            TypesTask = TypesTask.Closed;
+        }
+        public virtual List<AnswearOnTask> AnswearOnTask { get; set; } = new List<AnswearOnTask>();
     }
 }
