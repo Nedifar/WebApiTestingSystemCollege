@@ -53,7 +53,7 @@ namespace webApiipAweb.Controllers
                         {
                             chapexec.TestPackExecutions.Add(new Models.TestPackExecution { TestPack = mod4 });
                         }
-                        var packexec = chapexec.TestPackExecutions.Where(p => p.idTestPack == mod4.idTestPack).FirstOrDefault();
+                        var packexec = chapexec.TestPackExecutions.Where(p => p.TestPack == mod4).FirstOrDefault();
                         foreach (var mod3 in mod4.TaskWithOpenAnsws)
                         {
                             if (packexec.TaskWithOpenAnswsExecutions.Where(p => p.idTask == mod3.idTask).FirstOrDefault() == null) //???
@@ -105,7 +105,9 @@ namespace webApiipAweb.Controllers
                     accessFinalTest = p.accessProcentFinalTest,
                     Tasks = p.GetTasksExecution().Select(l => new
                     {
-                        Task = l,
+                        idTaskExecution = l.idTaskExecution,
+                        idTestPackExucution = l.idTestPackExecution,
+                        status = l.GetStatus(),
                         serialNumber = p.GetTasksExecution().IndexOf(l) + 1
                     })
                 }), 
@@ -127,7 +129,7 @@ namespace webApiipAweb.Controllers
                     return Ok(new
                     {
                         serialNumber = model.serialNumber,
-                        selectedAnswear = closed.AnswearOnTask.idAnswearOnTask,
+                        selectedAnswear = closed.AnswearOnTask?.idAnswearOnTask,
                         Answears = closed.TaskWithClosedAnsw.AnswearOnTask.Select(p => new
                         {
                             text = p.textAnswear,
@@ -179,8 +181,8 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpPost]
-        [Route("ReplyTaskOpenOnNumber")]
-        public async Task<ActionResult> ReplyTaskOpenOnNumber(PostModels.ReplyTaskClosedOnNumberPost model)
+        [Route("ReplyTaskClosedOnNumber")]
+        public async Task<ActionResult> ReplyTaskClosedOnNumber(PostModels.ReplyTaskClosedOnNumberPost model)
         {
             ///Добавь сюда сохарнеие результата без зависимости от правильности
             var s = context.TaskWithClosedAnswsExecutions
@@ -322,14 +324,18 @@ namespace webApiipAweb.Controllers
         {
             var testtask = context.TestTaskExecutions.Where(p => p.idTestTaskExecution == model.idTestTaskExecution).FirstOrDefault();
             testtask.AnswearOnTask = context.AnswearOnTasks.Where(p => p.idAnswearOnTask == model.idAnswearOnTask).FirstOrDefault();
-            context.SaveChanges();
             if (testtask.AnswearOnTask.accuracy)
             {
+                testtask.StatusExecution = StatusExecution.Correct;
+                await context.SaveChangesAsync();
                 return Ok("Верно");
             }
             else
             {
+                testtask.StatusExecution = StatusExecution.InCorrect;
+                await context.SaveChangesAsync();
                 return Ok("Не верно");
+
             }
 
         }
@@ -351,6 +357,7 @@ namespace webApiipAweb.Controllers
                 TestTaskExecutions = p.TestTaskExecutions.Select(s => new
                 {
                     idTestTaskExecution = s.idTestTaskExecution,
+                    status = s.GetStatus(),
                     answearOnTask = s.AnswearOnTask == null ? null : new
                     {
                         idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,

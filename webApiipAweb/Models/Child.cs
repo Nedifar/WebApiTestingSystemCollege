@@ -26,7 +26,7 @@ namespace webApiipAweb.Models
             get
             {
                 if(imagePath != null)
-                return AppDomain.CurrentDomain.BaseDirectory + imagePath;
+                return Convert.ToBase64String(System.IO.File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory + imagePath));
                 else
                     return null;
             }

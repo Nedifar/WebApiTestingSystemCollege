@@ -59,7 +59,7 @@ namespace webApiipAweb.Controllers
                                 textAppeal = s.textAppeal,
                                 type = s.TypeAppeal.typeName
                             }),
-                            image = Convert.ToBase64String(System.IO.File.ReadAllBytes(p.getRelevantPathImage))
+                            image = p.getRelevantPathImage
                         }).FirstOrDefault()); 
                     }
                     else
@@ -384,6 +384,22 @@ namespace webApiipAweb.Controllers
             context.SaveChanges();
             return Ok("Успешно");
         }
+
+        [HttpPost]
+        [Route("GetAppeals")]
+        public async Task<ActionResult> GetAppeals(GetAppealModel model)
+        {
+            var appealsSelectedChild = context.Appeals.Where(p => p.ChildId == model.idChild).Select(p=> new
+            {
+                idAppeal = p.idAppeal,
+                textAppeal = p.textAppeal,
+                dateAppeal = p.dateAppeal.ToString("HH.mm dd.MM.yyyy"),
+                type = p.TypeAppeal.typeName,
+                status = p.GetStatus(),
+                inArchive = p.inArchive
+            }).ToList();
+            return Ok(appealsSelectedChild == null?"У вас нет обращений.":appealsSelectedChild);
+        }
     }
 
 
@@ -423,5 +439,10 @@ namespace webApiipAweb.Controllers
         public string base64image { get; set; }
         public string lastName { get; set; }
         public string firstName { get; set; }
+    }
+
+    public class GetAppealModel
+    {
+        public string idChild { get; set; }
     }
 }

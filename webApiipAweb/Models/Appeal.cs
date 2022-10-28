@@ -20,6 +20,14 @@ namespace webApiipAweb.Models
         public virtual TypeAppeal TypeAppeal { get; set; }
         public string textAppeal { get; set; }
         public virtual Status status { get; set; }
+        public string GetStatus() => this.status switch
+        {
+            Status.InProcessing =>"В процессе",
+            Status.Reviewed => "Рассмотрен",
+            Status.Received =>"Принят",
+            Status.NotReceived =>"Не принят",
+            _=>throw new Exception()
+        };
         public bool inArchive { get; set; }
     }
     public enum Status : byte

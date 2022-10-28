@@ -77,7 +77,7 @@ namespace webApiipAweb.Controllers
                 await context.SaveChangesAsync();
                 return Ok("Изменения успешно зафиксированы.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -89,16 +89,16 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if(context.Subjects.Where(p=>p.LevelStuding.nameLevel == model.levelStuding && p.nameSubject == model.nameSubject).FirstOrDefault() ==null)
+                if (context.Subjects.Where(p => p.LevelStuding.nameLevel == model.levelStuding && p.nameSubject == model.nameSubject).FirstOrDefault() == null)
                 {
                     return BadRequest("Данного класса или предмета не существует.");
                 }
                 var selected = context.Subjects.Where(p => p.LevelStuding.nameLevel == model.levelStuding && p.nameSubject == model.nameSubject).FirstOrDefault();
-                if (selected.Chapters.Where(p=>p.name == model.name).FirstOrDefault()!=null)
+                if (selected.Chapters.Where(p => p.name == model.name).FirstOrDefault() != null)
                 {
                     return BadRequest("Данный раздел уже добавлен.");
                 }
-                selected.Chapters.Add(new Models.Chapter { Description = model.Description, name = model.name, access = model.access});
+                selected.Chapters.Add(new Models.Chapter { Description = model.Description, name = model.name, access = model.access });
                 await context.SaveChangesAsync();
                 return Ok("Объект успешно создан.");
             }
@@ -114,7 +114,7 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if (context.Subjects.Where(p => p.LevelStuding.nameLevel == teoM.levelStuding 
+                if (context.Subjects.Where(p => p.LevelStuding.nameLevel == teoM.levelStuding
                 && p.nameSubject == teoM.nameSubject).FirstOrDefault() == null)
                 {
                     return BadRequest("Данного класса, предмета не существует.");
@@ -125,7 +125,7 @@ namespace webApiipAweb.Controllers
                     return BadRequest("Данного раздела не существует.");
                 }
                 var selectedChapter = selected.Chapters.Where(p => p.name == teoM.chapterName).FirstOrDefault();
-                if(selectedChapter.TheoreticalMaterials.Where(p=>p.header == teoM.header).FirstOrDefault() !=null)
+                if (selectedChapter.TheoreticalMaterials.Where(p => p.header == teoM.header).FirstOrDefault() != null)
                 {
                     return BadRequest("Теоретический материал с данным заголовком уже существует.");
                 }
@@ -133,7 +133,7 @@ namespace webApiipAweb.Controllers
                 await context.SaveChangesAsync();
                 return Ok("Объект успешно создан.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -185,7 +185,7 @@ namespace webApiipAweb.Controllers
                 {
                     return BadRequest("Данная тестовая коллекция уже существует.");
                 }
-                selected.TestPacks.Add(new Models.TestPack { header = model.header});
+                selected.TestPacks.Add(new Models.TestPack { header = model.header });
                 context.SaveChanges();
                 return Ok("Объект успешно создан.");
             }
@@ -207,15 +207,15 @@ namespace webApiipAweb.Controllers
                 }
                 var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
                 var testTask = new Models.TestTask { textQuestion = model.textQuestion };
-                foreach(var mod in model.CreatingAnswearOnTaskModels)
+                foreach (var mod in model.CreatingAnswearOnTaskModels)
                 {
                     testTask.AnswearOnTasks.Add(new Models.AnswearOnTask { accuracy = mod.accuracy, textAnswear = mod.textAnswear });
                 }
-                if(selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault() ==null)
+                if (selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault() == null)
                 {
                     return BadRequest("Данной тестовой коллекции не существует.");
                 }
-                selected.TestPacks.Where(p=>p.header==model.testPackHeader).FirstOrDefault().TestTasks.Add(testTask);
+                selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TestTasks.Add(testTask);
                 context.SaveChanges();
                 return Ok("Объект успешно создан.");
             }
@@ -236,7 +236,8 @@ namespace webApiipAweb.Controllers
                     return BadRequest("Данного класса, предмета или раздела не существует.");
                 }
                 var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
-                var testTask = new Models.TaskWithOpenAnsw { textQuestion = model.textQuestion, theme=model.theme, answear = model.answear };
+
+                var testTask = new Models.TaskWithOpenAnsw { textQuestion = model.textQuestion, theme = model.theme, answear = model.answear };
                 foreach (var mod in model.CreatingSolutionModels)
                 {
                     using (var hhtp = new HttpClient())
@@ -249,12 +250,44 @@ namespace webApiipAweb.Controllers
                         testTask.Solutions.Add(new Models.Solution { url = res.image.url });
                     }
                 }
+
                 if (selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault() == null)
                 {
                     return BadRequest("Данной тестовой коллекции не существует.");
                 }
+
+                var listTasks = selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().GetNumbers();
+
+                switch (model.mode)
+                {
+                    case PostModels.ModeCreating.Start:
+                        for (int i = 0; i < listTasks.Count; i++)
+                        {
+                            listTasks[i].numericInPack = i + 2;
+                        }
+                        testTask.numericInPack = 1;
+                        break;
+                    case PostModels.ModeCreating.End:
+
+                        testTask.numericInPack = listTasks.Count + 1;
+                        break;
+                    case PostModels.ModeCreating.Insert:
+                        if (model.numberInList == null)
+                            return BadRequest("Не указан номер вставки.");
+                        for (int i = 0; i < listTasks.Count; i++)
+                        {
+                            if (model.numberInList - 1 > i)
+                                listTasks[i].numericInPack = i + 1;
+                            else
+                                listTasks[i].numericInPack = i + 2;
+                        }
+                        testTask.numericInPack = model.numberInList.Value;
+                        break;
+                    default:
+                        break;
+                }
                 selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TaskWithOpenAnsws.Add(testTask);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
                 return Ok("Объект успешно создан.");
             }
             catch (Exception ex)
@@ -295,6 +328,39 @@ namespace webApiipAweb.Controllers
                 {
                     return BadRequest("Данной тестовой коллекции не существует.");
                 }
+
+                var listTasks = selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().GetNumbers();
+
+
+                switch (model.mode)
+                {
+                    case PostModels.ModeCreating.Start:
+                        for (int i = 0; i < listTasks.Count; i++)
+                        {
+                            listTasks[i].numericInPack = i + 2;
+                        }
+                        testTask.numericInPack = 1;
+                        break;
+                    case PostModels.ModeCreating.End:
+
+                        testTask.numericInPack = listTasks.Count+1;
+                        break;
+                    case PostModels.ModeCreating.Insert:
+                        if (model.numberInList == null)
+                            return BadRequest("Не указан номер вставки.");
+                        for (int i = 0; i < listTasks.Count; i++)
+                        {
+                            if (model.numberInList - 1 > i)
+                                listTasks[i].numericInPack = i+1;
+                            else
+                                listTasks[i].numericInPack = i + 2;
+                        }
+                        testTask.numericInPack = model.numberInList.Value;
+                        break;
+                    default:
+                        break;
+                }
+
                 selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TaskWithClosedAnsws.Add(testTask);
                 context.SaveChanges();
                 return Ok("Объект успешно создан.");

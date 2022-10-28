@@ -11,6 +11,8 @@ namespace webApiipAweb.PostModels
         public string chapterName { get; set; }
         public string testPackHeader { get; set; }
         public string theme { get; set; }
+        public int? numberInList { get; set; }
+        public ModeCreating mode { get; set; } = ModeCreating.End;
         public virtual List<CreatingSolutionModel> CreatingSolutionModels { get; set; } = new List<CreatingSolutionModel>();
     }
 }

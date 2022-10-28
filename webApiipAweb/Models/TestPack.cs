@@ -19,5 +19,12 @@ namespace webApiipAweb.Models
         public virtual List<TaskWithOpenAnsw> TaskWithOpenAnsws { get; set; } = new List<TaskWithOpenAnsw>();
         public virtual List<TaskWithClosedAnsw> TaskWithClosedAnsws { get; set; } = new List<TaskWithClosedAnsw>();
         public virtual List<TestPackExecution> TestPackExecutions { get; set; } = new List<TestPackExecution>();
+
+        public List<ParentTask> GetNumbers()
+        {
+            var list = new List<ParentTask>(TaskWithClosedAnsws);
+            list.AddRange(TaskWithOpenAnsws);
+            return list.OrderBy(p=>p.numericInPack).ToList();
+        }
     }
 }

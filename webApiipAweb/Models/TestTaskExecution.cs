@@ -20,5 +20,20 @@ namespace webApiipAweb.Models
         [ForeignKey("AnswearOnTask")]
         public int? idAnswearOnTask { get; set; }
         public virtual AnswearOnTask AnswearOnTask { get; set; }
+        public StatusExecution StatusExecution { get; set; } = StatusExecution.Default;
+        public string GetStatus() => this.StatusExecution switch
+        {
+            StatusExecution.Correct => "Верно",
+            StatusExecution.InCorrect => "Неверно",
+            StatusExecution.Default => "Нет ответа",
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    public enum StatusExecution
+    {
+        Correct,
+        InCorrect,
+        Default
     }
 }

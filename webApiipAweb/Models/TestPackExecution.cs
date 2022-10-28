@@ -95,14 +95,16 @@ namespace webApiipAweb.Models
 
         public List<TaskExecutionParent> GetTasksExecution()
         {
-            var list = new List<TaskExecutionParent>(TaskWithOpenAnswsExecutions.Count() + TaskWithClosedAnswsExecutions.Count());
+            var list = new List<TaskExecutionParent>();
+            for (int i = 0; i < TaskWithOpenAnswsExecutions.Count() + TaskWithClosedAnswsExecutions.Count(); i++)
+                list.Add(null);
             foreach(var task in TaskWithOpenAnswsExecutions)
             {
-                list.Insert(task.TaskWithOpenAnsw.numericInPack-1, task);
+                list[task.TaskWithOpenAnsw.numericInPack - 1] = task;
             }
             foreach (var task in TaskWithClosedAnswsExecutions)
             {
-                list.Insert(task.TaskWithClosedAnsw.numericInPack - 1, task);
+                list[task.TaskWithClosedAnsw.numericInPack - 1]= task;
             }
             return list;
         }
