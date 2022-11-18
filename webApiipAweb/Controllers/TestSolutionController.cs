@@ -112,7 +112,7 @@ namespace webApiipAweb.Controllers
                         status = l.GetStatus(),
                         serialNumber = p.GetTasksExecution().IndexOf(l) + 1,
                         isIncreasedComplexity = l.isHard,
-                        theme = l.theme
+                        theme = l.themes
                     })
                 }), 
                 theory = p.Chapter.TheoreticalMaterials, 

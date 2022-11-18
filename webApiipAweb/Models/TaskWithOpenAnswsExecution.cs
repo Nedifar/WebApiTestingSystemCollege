@@ -25,7 +25,7 @@ namespace webApiipAweb.Models
         public StatusTaskExecution Status { get; set; }
 
         [NotMapped]
-        public string theme { get; set; }
+        public string themes { get; set; }
 
         public int timeExecutionInSecond { get; set; }
 

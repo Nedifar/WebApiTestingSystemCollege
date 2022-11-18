@@ -104,13 +104,13 @@ namespace webApiipAweb.Models
             {
                 list[task.TaskWithOpenAnsw.numericInPack - 1] = task;
                 list[task.TaskWithOpenAnsw.numericInPack - 1].isHard = task.TaskWithOpenAnsw.isIncreasedComplexity;
-                list[task.TaskWithOpenAnsw.numericInPack - 1].theme = task.theme;
+                list[task.TaskWithOpenAnsw.numericInPack - 1].themes = task.TaskWithOpenAnsw.theme;
             }
             foreach (var task in TaskWithClosedAnswsExecutions)
             {
                 list[task.TaskWithClosedAnsw.numericInPack - 1]= task;
                 list[task.TaskWithClosedAnsw.numericInPack - 1].isHard = task.TaskWithClosedAnsw.isIncreasedComplexity;
-                list[task.TaskWithClosedAnsw.numericInPack - 1].theme = task.theme;
+                list[task.TaskWithClosedAnsw.numericInPack - 1].themes = task.TaskWithClosedAnsw.theme;
             }
             return list;
         }
