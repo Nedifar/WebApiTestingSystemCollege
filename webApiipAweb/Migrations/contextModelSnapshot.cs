@@ -533,6 +533,9 @@ namespace webApiipAweb.Migrations
                     b.Property<int?>("idTestPack")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isIncreasedComplexity")
+                        .HasColumnType("bit");
+
                     b.Property<int>("numericInPack")
                         .HasColumnType("int");
 
@@ -559,9 +562,6 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TaskWithClosedAnswidTask")
-                        .HasColumnType("int");
-
                     b.Property<int?>("idAnswearOnTask")
                         .HasColumnType("int");
 
@@ -576,9 +576,9 @@ namespace webApiipAweb.Migrations
 
                     b.HasKey("idTaskExecution");
 
-                    b.HasIndex("TaskWithClosedAnswidTask");
-
                     b.HasIndex("idAnswearOnTask");
+
+                    b.HasIndex("idTask");
 
                     b.HasIndex("idTestPackExecution");
 
@@ -600,6 +600,9 @@ namespace webApiipAweb.Migrations
 
                     b.Property<int?>("idTestPack")
                         .HasColumnType("int");
+
+                    b.Property<bool>("isIncreasedComplexity")
+                        .HasColumnType("bit");
 
                     b.Property<int>("numericInPack")
                         .HasColumnType("int");
@@ -630,9 +633,6 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TaskWithOpenAnswidTask")
-                        .HasColumnType("int");
-
                     b.Property<int?>("idTask")
                         .HasColumnType("int");
 
@@ -644,7 +644,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasKey("idTaskExecution");
 
-                    b.HasIndex("TaskWithOpenAnswidTask");
+                    b.HasIndex("idTask");
 
                     b.HasIndex("idTestPackExecution");
 
@@ -657,6 +657,9 @@ namespace webApiipAweb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("header")
                         .HasColumnType("nvarchar(max)");
@@ -719,6 +722,9 @@ namespace webApiipAweb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("StatusExecution")
+                        .HasColumnType("int");
 
                     b.Property<int?>("idAnswearOnTask")
                         .HasColumnType("int");
@@ -1125,13 +1131,13 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithClosedAnswsExecution", b =>
                 {
-                    b.HasOne("webApiipAweb.Models.TaskWithClosedAnsw", "TaskWithClosedAnsw")
-                        .WithMany()
-                        .HasForeignKey("TaskWithClosedAnswidTask");
-
                     b.HasOne("webApiipAweb.Models.AnswearOnTask", "AnswearOnTask")
                         .WithMany()
                         .HasForeignKey("idAnswearOnTask");
+
+                    b.HasOne("webApiipAweb.Models.TaskWithClosedAnsw", "TaskWithClosedAnsw")
+                        .WithMany()
+                        .HasForeignKey("idTask");
 
                     b.HasOne("webApiipAweb.Models.TestPackExecution", "TestPackExecution")
                         .WithMany("TaskWithClosedAnswsExecutions")
@@ -1157,7 +1163,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.TaskWithOpenAnsw", "TaskWithOpenAnsw")
                         .WithMany()
-                        .HasForeignKey("TaskWithOpenAnswidTask");
+                        .HasForeignKey("idTask");
 
                     b.HasOne("webApiipAweb.Models.TestPackExecution", "TestPackExecution")
                         .WithMany("TaskWithOpenAnswsExecutions")

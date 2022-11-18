@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,32 +75,33 @@ namespace webApiipAweb.Controllers
                 }
             }
             await context.SaveChangesAsync();
-            return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject }));
+            return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject, ProgressInProcent = p.getProgressInProcent }));
         }
 
         [HttpPost]
         [Route("getChapters")]
         public async Task<ActionResult> GetChapters(PostTestModels.GetChaptersPost chaptersPost)
         {
-            var s = context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution).ToList();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, getProcentChapterDecide = p.getProcentChapter, getMaxProcentTest = p.getProcentChapterTest, getProcentDecideTaskWithOpen = p.getProcentChapterTask, idExec = p.idChapterExecution, access = p.Chapter.access }));
+            var s = await context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution).ToListAsync();
+            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, getProcentChapterDecide = p.getProcentChapter, MainPackProcent = p.getProcentMainTasks, OtherPackProcent = p.getProcentOtherTasks, idExec = p.idChapterExecution, access = p.Chapter.access }));
         }
 
         [HttpPost]
         [Route("getChapter")]
         public async Task<ActionResult> GetChapter(PostTestModels.GetChaptersPost chaptersPost)
         {
-            var s = context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToList();
+            var s = await context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToListAsync();
             return Ok(s.Select(p => new
             { 
                 NameChapter = p.Chapter.name, 
                 Description = p.Chapter.Description, 
                 idExec = p.idChapterExecution, 
                 getProcentChapterDecide = p.getProcentChapter,
-                getMaxProcentTest = p.getProcentChapterTest, 
-                getProcentDecideTaskWithOpen = p.getProcentChapterTask, 
+                MainPackProcent = p.getProcentMainTasks,
+                OtherPackProcent = p.getProcentOtherTasks, 
                 TestPack = p.TestPackExecutions.Select(p => new
                 {
+                    Type = p.TestPack.GetPackType(),
                     Header = p.TestPack.header,
                     haveFinalTest = p.haveFinalTest,
                     accessFinalTest = p.accessProcentFinalTest,
@@ -108,11 +110,14 @@ namespace webApiipAweb.Controllers
                         idTaskExecution = l.idTaskExecution,
                         idTestPackExucution = l.idTestPackExecution,
                         status = l.GetStatus(),
-                        serialNumber = p.GetTasksExecution().IndexOf(l) + 1
+                        serialNumber = p.GetTasksExecution().IndexOf(l) + 1,
+                        isIncreasedComplexity = l.isHard,
+                        theme = l.theme
                     })
                 }), 
                 theory = p.Chapter.TheoreticalMaterials, 
-                access = p.Chapter.access }));
+                access = p.Chapter.access,
+            }));
         }
 
         [HttpPost]
@@ -121,13 +126,14 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                var s = context.TestPackExecutions.Where(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack).FirstOrDefault();
+                var s = await context.TestPackExecutions.Where(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack).FirstOrDefaultAsync();
                 var closed = s.TaskWithClosedAnswsExecutions.Where(p => p.TaskWithClosedAnsw.numericInPack == model.serialNumber).FirstOrDefault();
                 var opened = s.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber).FirstOrDefault();
                 if (closed is not null)
                 {
                     return Ok(new
                     {
+                        textQuestion = closed.TaskWithClosedAnsw.textQuestion,
                         serialNumber = model.serialNumber,
                         selectedAnswear = closed.AnswearOnTask?.idAnswearOnTask,
                         Answears = closed.TaskWithClosedAnsw.AnswearOnTask.Select(p => new
@@ -135,7 +141,9 @@ namespace webApiipAweb.Controllers
                             text = p.textAnswear,
                             idAnswear = p.idAnswearOnTask
                         }),
-                        status = closed.GetStatus()
+                        status = closed.GetStatus(),
+                        type = closed.TaskWithClosedAnsw.TypesTask.ToString(),
+                        theme = closed.TaskWithClosedAnsw.theme
                     });
                 }
                 
@@ -143,9 +151,12 @@ namespace webApiipAweb.Controllers
                 {
                     return Ok(new
                     {
+                        textQuestion = opened.TaskWithOpenAnsw.textQuestion,
                         serialNumber = model.serialNumber,
                         selectedAnswear = opened.AnswearResult,
-                        status = closed.GetStatus()
+                        status = opened.GetStatus(),
+                        type = opened.TaskWithOpenAnsw.TypesTask.ToString(),
+                        theme = closed.TaskWithClosedAnsw.theme
                     });
                 }
                 else
@@ -260,7 +271,8 @@ namespace webApiipAweb.Controllers
                         answearOnTask = s.AnswearOnTask == null ? null : new
                         {
                             idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
-                            text = s.AnswearOnTask.textAnswear
+                            text = s.AnswearOnTask.textAnswear,
+                            status = s.GetStatus()
                         },
                         TestPack = new
                         {
@@ -337,7 +349,6 @@ namespace webApiipAweb.Controllers
                 return Ok("Не верно");
 
             }
-
         }
 
         private async Task<ActionResult> BeginTestSecond(PostTestModels.BeginTestModel model)

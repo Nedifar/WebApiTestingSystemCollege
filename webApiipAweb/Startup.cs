@@ -18,7 +18,7 @@ namespace webApiipAweb
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            string con = @"Server=sql8001.site4now.net;User id=db_a8c6d1_onemonthmayo_admin; pwd=gaz_gaz_Ilyas12;Database=db_a8c6d1_onemonthmayo;";
+            string con = @"Server=192.168.147.72\sqlexpress;User id=sa; pwd=ArbiDOL2+0;Database=GamificationBase;";
             services.AddDbContext<Models.context>(options => options.UseSqlServer(con).UseLazyLoadingProxies());
             services.AddIdentity<Models.Child, IdentityRole>()
                 .AddEntityFrameworkStores<Models.context>()

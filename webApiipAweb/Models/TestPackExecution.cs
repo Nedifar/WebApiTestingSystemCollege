@@ -28,7 +28,7 @@ namespace webApiipAweb.Models
         {
             get
             {
-                return getProcentDecideTaskWithOpen;
+                return getProcentTasks;
             }
         }
         public bool haveFinalTest
@@ -58,13 +58,15 @@ namespace webApiipAweb.Models
             }
         }
 
-        public int getProcentDecideTaskWithOpen
+        public int getProcentTasks
         {
             get
             {
                 try
                 {
-                    return 100 * TaskWithOpenAnswsExecutions.Where(p => p.Status == StatusTaskExecution.Correct).Count() / TaskWithOpenAnswsExecutions.Count();
+                    return 100 * 
+                        (TaskWithOpenAnswsExecutions.Where(p => p.Status == StatusTaskExecution.Correct).Count() + TaskWithClosedAnswsExecutions.Where(p => p.Status == StatusTaskExecution.Correct).Count()) 
+                        / (TaskWithOpenAnswsExecutions.Count() + TaskWithClosedAnswsExecutions.Count());
                 }
                 catch
                 {
@@ -81,7 +83,7 @@ namespace webApiipAweb.Models
                 int second = 0;
                 try
                 {
-                    first = 50 * getProcentDecideTaskWithOpen / 100;
+                    first = 50 * getProcentTasks / 100;
                 }
                 catch { }
                 try
@@ -101,13 +103,16 @@ namespace webApiipAweb.Models
             foreach(var task in TaskWithOpenAnswsExecutions)
             {
                 list[task.TaskWithOpenAnsw.numericInPack - 1] = task;
+                list[task.TaskWithOpenAnsw.numericInPack - 1].isHard = task.TaskWithOpenAnsw.isIncreasedComplexity;
+                list[task.TaskWithOpenAnsw.numericInPack - 1].theme = task.theme;
             }
             foreach (var task in TaskWithClosedAnswsExecutions)
             {
                 list[task.TaskWithClosedAnsw.numericInPack - 1]= task;
+                list[task.TaskWithClosedAnsw.numericInPack - 1].isHard = task.TaskWithClosedAnsw.isIncreasedComplexity;
+                list[task.TaskWithClosedAnsw.numericInPack - 1].theme = task.theme;
             }
             return list;
         }
-
     }
 }

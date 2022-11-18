@@ -185,7 +185,7 @@ namespace webApiipAweb.Controllers
                 {
                     return BadRequest("Данная тестовая коллекция уже существует.");
                 }
-                selected.TestPacks.Add(new Models.TestPack { header = model.header });
+                selected.TestPacks.Add(new Models.TestPack { header = model.header, Type = model.Type });
                 context.SaveChanges();
                 return Ok("Объект успешно создан.");
             }
@@ -237,7 +237,7 @@ namespace webApiipAweb.Controllers
                 }
                 var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
 
-                var testTask = new Models.TaskWithOpenAnsw { textQuestion = model.textQuestion, theme = model.theme, answear = model.answear };
+                var testTask = new Models.TaskWithOpenAnsw { textQuestion = model.textQuestion, theme = model.theme, answear = model.answear, isIncreasedComplexity = model.isIncreasedComplexity };
                 foreach (var mod in model.CreatingSolutionModels)
                 {
                     using (var hhtp = new HttpClient())
@@ -307,7 +307,7 @@ namespace webApiipAweb.Controllers
                     return BadRequest("Данного класса, предмета или раздела не существует.");
                 }
                 var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
-                var testTask = new Models.TaskWithClosedAnsw { textQuestion = model.textQuestion, theme = model.theme };
+                var testTask = new Models.TaskWithClosedAnsw { textQuestion = model.textQuestion, theme = model.theme, isIncreasedComplexity = model.isIncreasedComplexity };
                 foreach (var mod in model.CreatingSolutionModels)
                 {
                     using (var hhtp = new HttpClient())

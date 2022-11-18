@@ -60,7 +60,7 @@ namespace webApiipAweb.Controllers
                                 type = s.TypeAppeal.typeName
                             }),
                             image = p.getRelevantPathImage
-                        }).FirstOrDefault()); 
+                        }).FirstOrDefault());
                     }
                     else
                     {
@@ -85,7 +85,7 @@ namespace webApiipAweb.Controllers
             var ch = new Models.Child();
             try
             {
-                if(context.Users.Where(p=>p.Email == model.email).Count() !=0)
+                if (context.Users.Where(p => p.Email == model.email).Count() != 0)
                 {
                     return BadRequest("Данный email уже используется.");
                 }
@@ -97,18 +97,18 @@ namespace webApiipAweb.Controllers
                     firstName = model.firstName,
                 };
                 ch.UserName = ch.Id;
-                foreach(Models.ThingPack item in context.ThingPacks.ToList())
+                foreach (Models.ThingPack item in context.ThingPacks.ToList())
                 {
                     var thingExe = new Models.ThingPackExecution { ThingPack = item };
                     foreach (var iteem in item.Things)
                         thingExe.ThingExecutions.Add(new Models.ThingExecution { Thing = iteem });
                     ch.ThingPackExecutions.Add(thingExe);
                 }
-                
+
                 ch.LevelStudingExecutions.Add(new Models.LevelStudingExecution { LevelStuding = context.LevelStudings.Where(p => p.nameLevel == ch.levelStuding.ToString()).FirstOrDefault() });
                 //context.Children.Add(child);
                 var result = await _userManager.CreateAsync(ch, model.pas);
-                if(result.Succeeded)
+                if (result.Succeeded)
                 {
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(ch);
                     var callbackUrl = Url.Action(
@@ -130,7 +130,7 @@ namespace webApiipAweb.Controllers
                     return BadRequest(str);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await _userManager.DeleteAsync(ch);
                 return BadRequest(ex.Message);
@@ -165,7 +165,7 @@ namespace webApiipAweb.Controllers
                     result.firstName = profileModel.firstName;
                     result.lastName = profileModel.lastName;
                     result.levelStuding = profileModel.levelStuding;
-                    if(result.LevelStudingExecutions.Where(p=>p.LevelStuding.nameLevel == result.levelStuding.ToString()).FirstOrDefault() ==null)
+                    if (result.LevelStudingExecutions.Where(p => p.LevelStuding.nameLevel == result.levelStuding.ToString()).FirstOrDefault() == null)
                     {
                         result.LevelStudingExecutions.Add(new Models.LevelStudingExecution { LevelStuding = context.LevelStudings.Where(p => p.nameLevel == result.levelStuding.ToString()).FirstOrDefault() });
                     }
@@ -173,7 +173,7 @@ namespace webApiipAweb.Controllers
                     return Ok("Успешно");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -188,7 +188,7 @@ namespace webApiipAweb.Controllers
                 if (result != null)
                 {
                     var cc = await _userManager.GeneratePasswordResetTokenAsync(result);
-                    result.passRecoveryCode = new Random().Next(111111,999999).ToString();
+                    result.passRecoveryCode = new Random().Next(111111, 999999).ToString();
                     context.SaveChanges();
                     //var callbackUrl = Url.Action(
                     //    "ConfirmEmail",
@@ -202,16 +202,16 @@ namespace webApiipAweb.Controllers
                     return Content("Для завершения сброса пароля проверьте электронную почту и введите код, указанный в письме");
                 }
                 else
-                { 
+                {
                     return BadRequest("Данный email не найден");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-    
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
@@ -302,11 +302,11 @@ namespace webApiipAweb.Controllers
             var rr = result.ThingPackExecutions.Where(p => p.ThingPack.idThingPack == res.ThingPack.idThingPack).FirstOrDefault().ThingExecutions.Where(p => p.Thing.idThing == buyThing.idThing).FirstOrDefault();
             if (rr.isFinished)
                 return BadRequest("Данная позиция уже куплена");
-            if(rr.Thing.price <=result.point)
+            if (rr.Thing.price <= result.point)
             {
                 result.point -= rr.Thing.price;
                 rr.isFinished = true;
-                if(result.ThingPackExecutions.Where(p => p.ThingPack.idThingPack == res.ThingPack.idThingPack).FirstOrDefault().ThingExecutions.Where(p=>p.isFinished==false).Count()==0)
+                if (result.ThingPackExecutions.Where(p => p.ThingPack.idThingPack == res.ThingPack.idThingPack).FirstOrDefault().ThingExecutions.Where(p => p.isFinished == false).Count() == 0)
                 {
                     result.ThingPackExecutions.Where(p => p.ThingPack.idThingPack == res.ThingPack.idThingPack).FirstOrDefault().isCompleted = true;
                 }
@@ -317,7 +317,7 @@ namespace webApiipAweb.Controllers
             {
                 return BadRequest("Недостаточно поинтов для покупки данного предмета.");
             }
-            
+
         }
 
         [HttpPost]
@@ -325,16 +325,16 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> sendAppeal(PostModels.SendAppealModel model)
         {
             var child = context.Children.Where(p => p.Id == model.ChildId).FirstOrDefault();
-            if(child==null)
+            if (child == null)
             {
                 return BadRequest("Данного пользователя не существует");
             }
             var type = context.TypeAppeals.Where(p => p.typeName == model.type).FirstOrDefault();
-            if(type == null)
+            if (type == null)
             {
                 return BadRequest("Данного типа обращения не существует");
             }
-            child.Appeals.Add(new Models.Appeal { dateAppeal = DateTime.Now, status = Models.Status.InProcessing, TypeAppeal = type, textAppeal=model.textAppeal });
+            child.Appeals.Add(new Models.Appeal { dateAppeal = DateTime.Now, status = Models.Status.InProcessing, TypeAppeal = type, textAppeal = model.textAppeal });
             context.SaveChanges();
             return Ok("Успешно");
         }
@@ -389,7 +389,7 @@ namespace webApiipAweb.Controllers
         [Route("GetAppeals")]
         public async Task<ActionResult> GetAppeals(GetAppealModel model)
         {
-            var appealsSelectedChild = context.Appeals.Where(p => p.ChildId == model.idChild).Select(p=> new
+            var appealsSelectedChild = context.Appeals.Where(p => p.ChildId == model.idChild).Select(p => new
             {
                 idAppeal = p.idAppeal,
                 textAppeal = p.textAppeal,
@@ -398,7 +398,35 @@ namespace webApiipAweb.Controllers
                 status = p.GetStatus(),
                 inArchive = p.inArchive
             }).ToList();
-            return Ok(appealsSelectedChild == null?"У вас нет обращений.":appealsSelectedChild);
+            return Ok(appealsSelectedChild == null ? "У вас нет обращений." : appealsSelectedChild);
+        }
+
+        [HttpPost]
+        [Route("GetChapterResult")]
+        public async Task<ActionResult> GetChapterResult([FromForm] int idChapterExecution)
+        {
+            var chapter = context.ChapterExecutions.Where(p => p.idChapterExecution == idChapterExecution).FirstOrDefault();
+            if(chapter == null)
+            {
+                return BadRequest("Такого выполнения раздела не существует.");
+            }
+            else
+            {
+                return Ok(chapter.TestPackExecutions.Select(p => new
+                {
+                    Header = p.TestPack.header,
+                    Tasks = p.GetTasksExecution().Select(l => new
+                    {
+                        status = l.GetStatus(),
+                        serialNumber = p.GetTasksExecution().IndexOf(l) + 1
+                    }),
+                    Test = p.TryingTestTasks.OrderByDescending(p => p.result).FirstOrDefault()?.TestTaskExecutions.Select(s => new
+                    {
+                        number = p.TryingTestTasks.OrderByDescending(p => p.result).FirstOrDefault().TestTaskExecutions.IndexOf(s)+1,
+                        status = s.GetStatus()
+                    })
+                }));
+            }
         }
     }
 

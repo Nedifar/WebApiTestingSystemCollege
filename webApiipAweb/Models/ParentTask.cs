@@ -9,14 +9,23 @@ namespace webApiipAweb.Models
     {
         [Key]
         public int idTask { get; set; }
+
         public string textQuestion { get; set; }
+
         public string theme { get; set; }
+
         public int numericInPack { get; set; }
+
         public TypesTask TypesTask { get; set; }
+
         [ForeignKey("TestPack")]
         public int? idTestPack { get; set; }
+
         [JsonIgnore]
         public virtual TestPack TestPack { get; set; }
+
+        public bool isIncreasedComplexity { get; set; } = false;
+
         public virtual List<Solution> Solutions { get; set; } = new List<Solution>();
     }
 

@@ -19,8 +19,13 @@ namespace webApiipAweb.Models
         [JsonIgnore]
         public virtual TestPackExecution TestPackExecution { get; set; }
 
+        [NotMapped]
+        public bool isHard { get; set; } = false;
 
         public StatusTaskExecution Status { get; set; }
+
+        [NotMapped]
+        public string theme { get; set; }
 
         public int timeExecutionInSecond { get; set; }
 
@@ -37,7 +42,7 @@ namespace webApiipAweb.Models
     {
         public string AnswearResult { get; set; }
 
-        [ForeignKey("TaskWithOpenAnsws")]
+        [ForeignKey("TaskWithOpenAnsw")]
         public int? idTask { get; set; }
 
         public virtual TaskWithOpenAnsw TaskWithOpenAnsw { get; set; }
@@ -50,7 +55,7 @@ namespace webApiipAweb.Models
 
         public virtual AnswearOnTask AnswearOnTask { get; set; }
 
-        [ForeignKey("TaskWithOpenAnsws")]
+        [ForeignKey("TaskWithClosedAnsw")]
         public int? idTask { get; set; }
 
         public virtual TaskWithClosedAnsw TaskWithClosedAnsw { get; set; }
