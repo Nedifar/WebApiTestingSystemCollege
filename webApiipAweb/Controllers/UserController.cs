@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using webApiipAweb.Email;
 
@@ -37,10 +38,20 @@ namespace webApiipAweb.Controllers
             {
                 var child = await _userManager.FindByEmailAsync(signPost.email);
                 var res = await _signInManager.CheckPasswordSignInAsync(child, signPost.pas, false);
+
                 if (res.Succeeded)
                 {
                     if (await _userManager.IsEmailConfirmedAsync(child))
                     {
+                        string imageUrl  = String.Empty;
+                        using (var http = new HttpClient())
+                        {
+                            var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage?name={child.imagePath}");
+                            if(request.StatusCode == System.Net.HttpStatusCode.OK)
+                            {
+                                imageUrl = "http://192.168.147.72:83/" + $"img{child.Id}.jpeg";
+                            }
+                        }
                         return Ok(context.Children.Where(p => p.Email == signPost.email).Select(p => new
                         {
                             ChildId = p.Id,
@@ -59,7 +70,7 @@ namespace webApiipAweb.Controllers
                                 textAppeal = s.textAppeal,
                                 type = s.TypeAppeal.typeName
                             }),
-                            image = p.getRelevantPathImage
+                            image = imageUrl
                         }).FirstOrDefault());
                     }
                     else
@@ -152,11 +163,10 @@ namespace webApiipAweb.Controllers
                     {
                         try
                         {
-                            var bytes = Convert.FromBase64String(profileModel.base64image);
-                            using (var imageFile = new FileStream($"{AppDomain.CurrentDomain.BaseDirectory}images/img{profileModel.idUser}.jpeg", FileMode.Create))
+                            var modelImageSet = new { name = profileModel.idUser, base64 = profileModel.base64image };
+                            using(var http = new HttpClient())
                             {
-                                imageFile.Write(bytes, 0, bytes.Length);
-                                imageFile.Flush();
+                                var request = await http.PostAsync("http://192.168.147.72:83/api/userprofileimage", modelImageSet, new JsonMediaTypeFormatter());
                                 result.imagePath = $"images/img{profileModel.idUser}.jpeg";
                             }
                         }
