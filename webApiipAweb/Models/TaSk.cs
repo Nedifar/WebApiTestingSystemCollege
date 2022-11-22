@@ -14,7 +14,13 @@ namespace webApiipAweb.Models
         {
             TypesTask = TypesTask.Opened;
         }
-        public string answear { get; set; }
+
+        public double fine { get; set; }
+
+        public bool orderImportant { get; set; }
+
+        public virtual List<AnswearOnTaskOpen> AnswearOnTaskOpens { get; set; } = new List<AnswearOnTaskOpen>();
+
     }
 
     public class TaskWithClosedAnsw : ParentTask

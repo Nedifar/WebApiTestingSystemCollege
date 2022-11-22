@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webApiipAweb.Models;
 
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    partial class contextModelSnapshot : ModelSnapshot
+    [Migration("20221122053314_22.11.2022 second")]
+    partial class _22112022second
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -261,8 +263,8 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("idTask")
                         .HasColumnType("int");
 
-                    b.Property<double>("mark")
-                        .HasColumnType("float");
+                    b.Property<int>("mark")
+                        .HasColumnType("int");
 
                     b.HasKey("idAnswearOnTaskOpen");
 
@@ -594,9 +596,6 @@ namespace webApiipAweb.Migrations
                     b.Property<int?>("idTestPackExecution")
                         .HasColumnType("int");
 
-                    b.Property<double>("mark")
-                        .HasColumnType("float");
-
                     b.Property<int>("timeExecutionInSecond")
                         .HasColumnType("int");
 
@@ -621,8 +620,8 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
-                    b.Property<double>("fine")
-                        .HasColumnType("float");
+                    b.Property<string>("answear")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("idTestPack")
                         .HasColumnType("int");
@@ -641,6 +640,9 @@ namespace webApiipAweb.Migrations
 
                     b.Property<string>("theme")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("totalMark")
+                        .HasColumnType("int");
 
                     b.HasKey("idTask");
 
@@ -667,9 +669,6 @@ namespace webApiipAweb.Migrations
 
                     b.Property<int?>("idTestPackExecution")
                         .HasColumnType("int");
-
-                    b.Property<double>("mark")
-                        .HasColumnType("float");
 
                     b.Property<int>("timeExecutionInSecond")
                         .HasColumnType("int");

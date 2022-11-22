@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 
 namespace webApiipAweb.Controllers
@@ -237,7 +238,13 @@ namespace webApiipAweb.Controllers
                 }
                 var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
 
-                var testTask = new Models.TaskWithOpenAnsw { textQuestion = model.textQuestion, theme = model.theme, answear = model.answear, isIncreasedComplexity = model.isIncreasedComplexity };
+                var testTask = new Models.TaskWithOpenAnsw { textQuestion = model.textQuestion, theme = model.theme, isIncreasedComplexity = model.isIncreasedComplexity };
+
+                foreach (var item in model.answears)
+                {
+                    testTask.AnswearOnTaskOpens.Add(new Models.AnswearOnTaskOpen { answear = item.answear, mark = item.mark });
+                }
+
                 foreach (var mod in model.CreatingSolutionModels)
                 {
                     using (var hhtp = new HttpClient())
@@ -288,6 +295,20 @@ namespace webApiipAweb.Controllers
                 }
                 selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TaskWithOpenAnsws.Add(testTask);
                 await context.SaveChangesAsync();
+                var task = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault()
+                    .TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault()
+                    .TaskWithOpenAnsws.OrderByDescending(p=>p.idTask).FirstOrDefault();
+                try
+                {
+                    var modelImageSet = new { name = task.idTask, base64 = model.answears }; //????????????
+                    using (var http = new HttpClient())
+                    {
+                        var request = await http.PostAsync("http://192.168.147.72:83/api/userprofileimage", modelImageSet, new JsonMediaTypeFormatter());
+                        task.textQuestion = $"images/task{task.idTask}.jpeg";
+                    }
+                }
+                catch { return BadRequest("Проблемы с добавлением изображения."); }
+
                 return Ok("Объект успешно создан.");
             }
             catch (Exception ex)

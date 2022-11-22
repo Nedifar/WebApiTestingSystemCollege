@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webApiipAweb.Models;
 
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    partial class contextModelSnapshot : ModelSnapshot
+    [Migration("20221122090634_22.11.2022 3")]
+    partial class _221120223
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -620,9 +622,6 @@ namespace webApiipAweb.Migrations
 
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
-
-                    b.Property<double>("fine")
-                        .HasColumnType("float");
 
                     b.Property<int?>("idTestPack")
                         .HasColumnType("int");

@@ -49,7 +49,7 @@ namespace webApiipAweb.Controllers
                             var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage?name={child.imagePath}");
                             if(request.StatusCode == System.Net.HttpStatusCode.OK)
                             {
-                                imageUrl = "http://192.168.147.72:83/" + $"img{child.Id}.jpeg";
+                                imageUrl = "http://192.168.147.72:83" + $"img{child.Id}.jpeg";
                             }
                         }
                         return Ok(context.Children.Where(p => p.Email == signPost.email).Select(p => new

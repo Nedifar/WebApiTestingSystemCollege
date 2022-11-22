@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webApiipAweb.Models;
 
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    partial class contextModelSnapshot : ModelSnapshot
+    [Migration("20221122042905_22.11.2022 first")]
+    partial class _22112022first
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -246,29 +248,6 @@ namespace webApiipAweb.Migrations
                     b.HasIndex("idTestTask");
 
                     b.ToTable("AnswearOnTasks");
-                });
-
-            modelBuilder.Entity("webApiipAweb.Models.AnswearOnTaskOpen", b =>
-                {
-                    b.Property<int>("idAnswearOnTaskOpen")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("answear")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("idTask")
-                        .HasColumnType("int");
-
-                    b.Property<double>("mark")
-                        .HasColumnType("float");
-
-                    b.HasKey("idAnswearOnTaskOpen");
-
-                    b.HasIndex("idTask");
-
-                    b.ToTable("AnswearOnTaskOpen");
                 });
 
             modelBuilder.Entity("webApiipAweb.Models.Appeal", b =>
@@ -594,9 +573,6 @@ namespace webApiipAweb.Migrations
                     b.Property<int?>("idTestPackExecution")
                         .HasColumnType("int");
 
-                    b.Property<double>("mark")
-                        .HasColumnType("float");
-
                     b.Property<int>("timeExecutionInSecond")
                         .HasColumnType("int");
 
@@ -621,8 +597,8 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
-                    b.Property<double>("fine")
-                        .HasColumnType("float");
+                    b.Property<string>("answear")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("idTestPack")
                         .HasColumnType("int");
@@ -667,9 +643,6 @@ namespace webApiipAweb.Migrations
 
                     b.Property<int?>("idTestPackExecution")
                         .HasColumnType("int");
-
-                    b.Property<double>("mark")
-                        .HasColumnType("float");
 
                     b.Property<int>("timeExecutionInSecond")
                         .HasColumnType("int");
@@ -1047,17 +1020,6 @@ namespace webApiipAweb.Migrations
                     b.Navigation("TestTask");
                 });
 
-            modelBuilder.Entity("webApiipAweb.Models.AnswearOnTaskOpen", b =>
-                {
-                    b.HasOne("webApiipAweb.Models.TaskWithOpenAnsw", "TaskWithOpenAnsw")
-                        .WithMany("AnswearOnTaskOpens")
-                        .HasForeignKey("idTask")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TaskWithOpenAnsw");
-                });
-
             modelBuilder.Entity("webApiipAweb.Models.Appeal", b =>
                 {
                     b.HasOne("webApiipAweb.Models.Child", "Child")
@@ -1403,8 +1365,6 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithOpenAnsw", b =>
                 {
-                    b.Navigation("AnswearOnTaskOpens");
-
                     b.Navigation("Solutions");
                 });
 

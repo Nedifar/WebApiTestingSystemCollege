@@ -16,7 +16,7 @@ namespace webApiipAweb.PostModels
 
         public string chapter { get; set; }
 
-        public string answear { get; set; }
+        public List<AnsModel> answears { get; set; } = new List<AnsModel>();
 
         public string theme { get; set; }
 
@@ -37,5 +37,11 @@ namespace webApiipAweb.PostModels
         Start,
         End,
         Insert
+    }
+
+    public class AnsModel
+    {
+        public string answear { get; set; }
+        public double mark { get; set; }
     }
 }

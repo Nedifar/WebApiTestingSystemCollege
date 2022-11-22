@@ -22,6 +22,8 @@ namespace webApiipAweb.Models
         [NotMapped]
         public bool isHard { get; set; } = false;
 
+        public double mark { get; set; }
+
         public StatusTaskExecution Status { get; set; }
 
         [NotMapped]
@@ -65,6 +67,7 @@ namespace webApiipAweb.Models
     {
         AwaitingExecution,
         Correct,
-        InCorrect
+        InCorrect,
+        PartCorrect
     }
 }

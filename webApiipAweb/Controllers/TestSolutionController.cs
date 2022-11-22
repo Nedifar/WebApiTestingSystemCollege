@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using webApiipAweb.Models;
 
@@ -92,13 +93,14 @@ namespace webApiipAweb.Controllers
         {
             var s = await context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToListAsync();
             return Ok(s.Select(p => new
-            { 
-                NameChapter = p.Chapter.name, 
-                Description = p.Chapter.Description, 
-                idExec = p.idChapterExecution, 
+            {
+                NameChapter = p.Chapter.name,
+                Description = p.Chapter.Description,
+                idExec = p.idChapterExecution,
                 getProcentChapterDecide = p.getProcentChapter,
                 MainPackProcent = p.getProcentMainTasks,
-                OtherPackProcent = p.getProcentOtherTasks, 
+                OtherPackProcent = p.getProcentOtherTasks,
+                
                 TestPack = p.TestPackExecutions.Select(p => new
                 {
                     Type = p.TestPack.GetPackType(),
@@ -114,8 +116,8 @@ namespace webApiipAweb.Controllers
                         isIncreasedComplexity = l.isHard,
                         theme = l.themes
                     })
-                }), 
-                theory = p.Chapter.TheoreticalMaterials, 
+                }),
+                theory = p.Chapter.TheoreticalMaterials,
                 access = p.Chapter.access,
             }));
         }
@@ -129,8 +131,19 @@ namespace webApiipAweb.Controllers
                 var s = await context.TestPackExecutions.Where(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack).FirstOrDefaultAsync();
                 var closed = s.TaskWithClosedAnswsExecutions.Where(p => p.TaskWithClosedAnsw.numericInPack == model.serialNumber).FirstOrDefault();
                 var opened = s.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber).FirstOrDefault();
+                int? id = opened?.idTask ?? closed?.idTask;
+                string imageUrl = String.Empty;
+                using (var http = new HttpClient())
+                {
+                    var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage?name={id}");
+                    if (request.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        imageUrl = "http://192.168.147.72:83" + $"task{id}.jpeg";
+                    }
+                }
                 if (closed is not null)
                 {
+
                     return Ok(new
                     {
                         textQuestion = closed.TaskWithClosedAnsw.textQuestion,
@@ -146,8 +159,8 @@ namespace webApiipAweb.Controllers
                         theme = closed.TaskWithClosedAnsw.theme
                     });
                 }
-                
-                else if(opened is not null)
+
+                else if (opened is not null)
                 {
                     return Ok(new
                     {
@@ -175,16 +188,106 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> ReplyTaskOpenOnNumber(PostModels.ReplyTaskOpenOnNumberPost model)
         {
             var s = context.TaskWithOpenAnswsExecutions
-                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
-                && p.TestPackExecution.TestPack.header == model.testPackHeader 
+                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
+                && p.TestPackExecution.TestPack.header == model.testPackHeader
                 && p.TaskWithOpenAnsw.numericInPack == model.serialNumber)
                 .FirstOrDefault();
             s.AnswearResult = model.answear;
-            if (s.TaskWithOpenAnsw.answear.ToLower().Trim() == model.answear.ToLower().Trim())
+
+            double mark = 0;
+            int count = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Count();
+
+            string ans = model.answear;
+
+            switch (s.TaskWithOpenAnsw.orderImportant)
+            {
+                case true:
+                    {
+                        if (count == 1)
+                        {
+                            if (s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear == model.answear)
+                            {
+                                mark += s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().mark;
+                            }
+                        }
+                        else if (count > 1)
+                        {
+                            foreach (var item in s.TaskWithOpenAnsw.AnswearOnTaskOpens)
+                            {
+                                if (ans.IndexOf(item.answear) == 0)
+                                {
+                                    mark += item.mark;
+                                    ans = ans.Remove(0, item.answear.Length);
+                                }
+                                else
+                                {
+                                    ans = ans.Remove(0, item.answear.Length);
+                                    mark -= s.TaskWithOpenAnsw.fine;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                case false:
+                    {
+                        if (count == 1)
+                        {
+                            bool accuracy = true;
+                            foreach (var item in s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear)
+                                if (ans.Contains(item.ToString()))
+                                {
+                                    ans = ans.Replace(item.ToString(), "");
+                                }
+                                else
+                                {
+                                    accuracy = false;
+                                }
+                            if (ans.Length != 0)
+                            {
+                                accuracy = false;
+                            }
+                            else
+                            {
+                                mark = s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().mark;
+                            }
+                        }
+                        else if (count > 1)
+                        {
+                            foreach (var item in s.TaskWithOpenAnsw.AnswearOnTaskOpens)
+                            {
+                                if (ans.Contains(item.answear))
+                                {
+                                    mark += item.mark;
+                                    ans = ans.Replace(item.answear, "");
+                                }
+                                else
+                                {
+                                    mark -= s.TaskWithOpenAnsw.fine;
+                                }
+                            }
+                            if (ans.Length != 0)
+                            {
+                                mark -= (s.TaskWithOpenAnsw.fine) * ans.Length;
+                            }
+                        }
+                        break;
+                    }
+            }
+            if (mark < 0)
+                mark = 0;
+            s.mark = mark;
+
+            if (s.mark == s.TaskWithOpenAnsw.AnswearOnTaskOpens.Sum(p => p.mark))
             {
                 s.Status = StatusTaskExecution.Correct;
                 await context.SaveChangesAsync();
                 return Ok("Ответ верный.");
+            }
+            else if(s.mark > 0)
+            {
+                s.Status = StatusTaskExecution.PartCorrect;
+                await context.SaveChangesAsync();
+                return Ok("Ответ частично верный.");
             }
             s.Status = StatusTaskExecution.InCorrect;
             await context.SaveChangesAsync();
@@ -197,12 +300,12 @@ namespace webApiipAweb.Controllers
         {
             ///Добавь сюда сохарнеие результата без зависимости от правильности
             var s = context.TaskWithClosedAnswsExecutions
-                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
-                && p.TestPackExecution.TestPack.header == model.testPackHeader 
+                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
+                && p.TestPackExecution.TestPack.header == model.testPackHeader
                 && p.TaskWithClosedAnsw.numericInPack == model.serialNumber)
                 .FirstOrDefault();
             s.AnswearOnTask = context.AnswearOnTasks.Where(p => p.idAnswearOnTask == model.idAnswear).FirstOrDefault();
-            if (s.TaskWithClosedAnsw.AnswearOnTask.Where(p=>p.accuracy).FirstOrDefault().idAnswearOnTask == model.idAnswear)
+            if (s.TaskWithClosedAnsw.AnswearOnTask.Where(p => p.accuracy).FirstOrDefault().idAnswearOnTask == model.idAnswear)
             {
                 s.Status = StatusTaskExecution.Correct;
                 await context.SaveChangesAsync();
