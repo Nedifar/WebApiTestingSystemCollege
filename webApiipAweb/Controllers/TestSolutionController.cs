@@ -84,7 +84,7 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapters(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = await context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution).ToListAsync();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, getProcentChapterDecide = p.getProcentChapter, MainPackProcent = p.getProcentMainTasks, OtherPackProcent = p.getProcentOtherTasks, idExec = p.idChapterExecution, access = p.Chapter.access }));
+            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, getProcentChapterDecide = p.getProcentMainTasks, MainPackProcent = p.getProcentMainTasks, OtherPackProcent = p.getProcentOtherTasks, idExec = p.idChapterExecution, access = p.Chapter.access }));
         }
 
         [HttpPost]
@@ -135,11 +135,11 @@ namespace webApiipAweb.Controllers
                 string imageUrl = String.Empty;
                 using (var http = new HttpClient())
                 {
-                    var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage?name={id}");
-                    if (request.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        imageUrl = "http://192.168.147.72:83" + $"task{id}.jpeg";
-                    }
+                    //var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage/task?name=task{id}.jpeg");
+                    //if (request.StatusCode == System.Net.HttpStatusCode.OK)
+                    //{
+                        imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
+                    //}
                 }
                 if (closed is not null)
                 {
@@ -164,12 +164,12 @@ namespace webApiipAweb.Controllers
                 {
                     return Ok(new
                     {
-                        textQuestion = opened.TaskWithOpenAnsw.textQuestion,
+                        textQuestion = imageUrl,
                         serialNumber = model.serialNumber,
                         selectedAnswear = opened.AnswearResult,
                         status = opened.GetStatus(),
                         type = opened.TaskWithOpenAnsw.TypesTask.ToString(),
-                        theme = closed.TaskWithClosedAnsw.theme
+                        theme = opened.TaskWithOpenAnsw.theme
                     });
                 }
                 else
@@ -194,7 +194,7 @@ namespace webApiipAweb.Controllers
                 .FirstOrDefault();
             s.AnswearResult = model.answear;
 
-            double mark = 0;
+            double mark = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Sum(p=>p.mark);
             int count = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Count();
 
             string ans = model.answear;
@@ -205,9 +205,9 @@ namespace webApiipAweb.Controllers
                     {
                         if (count == 1)
                         {
-                            if (s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear == model.answear)
+                            if (s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear != model.answear)
                             {
-                                mark += s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().mark;
+                                mark = 0;
                             }
                         }
                         else if (count > 1)
@@ -216,7 +216,6 @@ namespace webApiipAweb.Controllers
                             {
                                 if (ans.IndexOf(item.answear) == 0)
                                 {
-                                    mark += item.mark;
                                     ans = ans.Remove(0, item.answear.Length);
                                 }
                                 else
@@ -232,7 +231,6 @@ namespace webApiipAweb.Controllers
                     {
                         if (count == 1)
                         {
-                            bool accuracy = true;
                             foreach (var item in s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear)
                                 if (ans.Contains(item.ToString()))
                                 {
@@ -240,15 +238,12 @@ namespace webApiipAweb.Controllers
                                 }
                                 else
                                 {
-                                    accuracy = false;
+                                    mark -= s.TaskWithOpenAnsw.fine;
                                 }
+
                             if (ans.Length != 0)
                             {
-                                accuracy = false;
-                            }
-                            else
-                            {
-                                mark = s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().mark;
+                                mark -= (s.TaskWithOpenAnsw.fine) * ans.Length;
                             }
                         }
                         else if (count > 1)
@@ -257,7 +252,6 @@ namespace webApiipAweb.Controllers
                             {
                                 if (ans.Contains(item.answear))
                                 {
-                                    mark += item.mark;
                                     ans = ans.Replace(item.answear, "");
                                 }
                                 else

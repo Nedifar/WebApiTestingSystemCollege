@@ -35,7 +35,7 @@ namespace webApiipAweb.Models
         {
             get
             {
-                if(TestPack.TestTasks.Count() !=0)
+                if (TestPack.TestTasks.Count() != 0)
                 {
                     return true;
                 }
@@ -44,7 +44,7 @@ namespace webApiipAweb.Models
         }
         public virtual List<TaskWithOpenAnswsExecution> TaskWithOpenAnswsExecutions { get; set; } = new List<TaskWithOpenAnswsExecution>();
 
-        public virtual List<TaskWithClosedAnswsExecution> TaskWithClosedAnswsExecutions{ get; set; } = new List<TaskWithClosedAnswsExecution>();
+        public virtual List<TaskWithClosedAnswsExecution> TaskWithClosedAnswsExecutions { get; set; } = new List<TaskWithClosedAnswsExecution>();
 
         public int getMaxProcentTest
         {
@@ -64,8 +64,8 @@ namespace webApiipAweb.Models
             {
                 try
                 {
-                    return 100 * 
-                        (TaskWithOpenAnswsExecutions.Where(p => p.Status == StatusTaskExecution.Correct).Count() + TaskWithClosedAnswsExecutions.Where(p => p.Status == StatusTaskExecution.Correct).Count()) 
+                    return 100 *
+                        (TaskWithOpenAnswsExecutions.Where(p => p.Status == StatusTaskExecution.Correct).Count() + TaskWithClosedAnswsExecutions.Where(p => p.Status == StatusTaskExecution.Correct).Count())
                         / (TaskWithOpenAnswsExecutions.Count() + TaskWithClosedAnswsExecutions.Count());
                 }
                 catch
@@ -83,14 +83,18 @@ namespace webApiipAweb.Models
                 int second = 0;
                 try
                 {
+
                     first = 50 * getProcentTasks / 100;
+                    if (TestPack.TestTasks.Count() == 0)
+                        first *= 2;
                 }
                 catch { }
                 try
                 {
-                    first = 50 * getMaxProcentTest / 100;
+                    second = 50 * getMaxProcentTest / 100;
                 }
                 catch { }
+
                 return first + second;
             }
         }
@@ -100,7 +104,7 @@ namespace webApiipAweb.Models
             var list = new List<TaskExecutionParent>();
             for (int i = 0; i < TaskWithOpenAnswsExecutions.Count() + TaskWithClosedAnswsExecutions.Count(); i++)
                 list.Add(null);
-            foreach(var task in TaskWithOpenAnswsExecutions)
+            foreach (var task in TaskWithOpenAnswsExecutions)
             {
                 list[task.TaskWithOpenAnsw.numericInPack - 1] = task;
                 list[task.TaskWithOpenAnsw.numericInPack - 1].isHard = task.TaskWithOpenAnsw.isIncreasedComplexity;
@@ -108,7 +112,7 @@ namespace webApiipAweb.Models
             }
             foreach (var task in TaskWithClosedAnswsExecutions)
             {
-                list[task.TaskWithClosedAnsw.numericInPack - 1]= task;
+                list[task.TaskWithClosedAnsw.numericInPack - 1] = task;
                 list[task.TaskWithClosedAnsw.numericInPack - 1].isHard = task.TaskWithClosedAnsw.isIncreasedComplexity;
                 list[task.TaskWithClosedAnsw.numericInPack - 1].themes = task.TaskWithClosedAnsw.theme;
             }
