@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Этот файл используется процессом публикации или упаковки вашего веб-проекта. Можно настроить поведение этого процесса,
+изменив этот файл MSBuild. Подробности см. на странице https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword />
+    <_PublishTargetUrl>ftp://win8041.site4now.net:21/site1</_PublishTargetUrl>
+    <History>True|2022-10-31T07:12:51.5412154Z;True|2022-10-31T09:21:30.4567347+05:00;True|2022-10-28T14:12:03.6052012+05:00;True|2022-10-28T11:42:04.3500952+05:00;False|2022-10-28T11:38:29.8702530+05:00;True|2022-10-27T14:54:11.8619762+05:00;True|2022-10-26T11:35:04.3677189+05:00;False|2022-10-26T11:16:01.3055688+05:00;True|2022-10-25T14:49:52.7593645+05:00;True|2022-10-25T12:00:59.5269458+05:00;True|2022-10-20T23:28:36.7891296+05:00;True|2022-10-15T18:22:15.4297419+05:00;False|2022-10-15T18:18:10.6684711+05:00;False|2022-10-15T18:18:05.7183589+05:00;True|2022-10-13T19:32:18.3434141+05:00;True|2022-10-13T19:05:25.5342466+05:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="appsettings.Development.json">
+      <publishTime>10/21/2022 14:08:32</publishTime>
+    </File>
+    <File Include="appsettings.json">
+      <publishTime>10/21/2022 14:08:32</publishTime>
+    </File>
+    <File Include="BouncyCastle.Crypto.dll">
+      <publishTime>10/19/2021 16:53:34</publishTime>
+    </File>
+    <File Include="Castle.Core.dll">
+      <publishTime>06/05/2020 16:02:04</publishTime>
+    </File>
+    <File Include="MailKit.dll">
+      <publishTime>12/06/2022 07:12:44</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Cryptography.Internal.dll">
+      <publishTime>04/16/2022 03:16:36</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Cryptography.KeyDerivation.dll">
+      <publishTime>04/16/2022 03:18:38</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll">
+      <publishTime>04/16/2022 03:20:14</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.JsonPatch.dll">
+      <publishTime>04/16/2022 03:16:36</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll">
+      <publishTime>04/16/2022 03:20:36</publishTime>
+    </File>
+    <File Include="Microsoft.Data.SqlClient.dll">
+      <publishTime>08/26/2020 04:24:48</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.Abstractions.dll">
+      <publishTime>04/13/2022 03:29:32</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.dll">
+      <publishTime>04/13/2022 03:29:46</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.Proxies.dll">
+      <publishTime>04/13/2022 03:29:50</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.Relational.dll">
+      <publishTime>04/13/2022 03:29:56</publishTime>
+    </File>
+    <File Include="Microsoft.EntityFrameworkCore.SqlServer.dll">
+      <publishTime>01/01/0001 00:00:00</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.DependencyInjection.dll">
+      <publishTime>06/16/2021 00:12:46</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Identity.Core.dll">
+      <publishTime>04/16/2022 03:19:06</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Identity.Stores.dll">
+      <publishTime>04/16/2022 03:20:12</publishTime>
+    </File>
+    <File Include="Microsoft.Identity.Client.dll">
+      <publishTime>05/19/2020 01:11:54</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.JsonWebTokens.dll">
+      <publishTime>10/19/2019 04:39:24</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Logging.dll">
+      <publishTime>10/19/2019 04:40:20</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Protocols.dll">
+      <publishTime>10/19/2019 04:41:02</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll">
+      <publishTime>10/19/2019 04:48:48</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Tokens.dll">
+      <publishTime>10/19/2019 04:43:40</publishTime>
+    </File>
+    <File Include="MimeKit.dll">
+      <publishTime>12/06/2022 00:02:54</publishTime>
+    </File>
+    <File Include="Newtonsoft.Json.Bson.dll">
+      <publishTime>11/28/2018 01:10:18</publishTime>
+    </File>
+    <File Include="Newtonsoft.Json.dll">
+      <publishTime>04/22/2019 06:06:16</publishTime>
+    </File>
+    <File Include="Npgsql.dll">
+      <publishTime>09/15/2021 11:41:30</publishTime>
+    </File>
+    <File Include="Npgsql.EntityFrameworkCore.PostgreSQL.dll">
+      <publishTime>09/15/2021 12:03:52</publishTime>
+    </File>
+    <File Include="runtimes/unix/lib/netcoreapp3.1/Microsoft.Data.SqlClient.dll">
+      <publishTime>08/26/2020 04:25:12</publishTime>
+    </File>
+    <File Include="runtimes/win-arm/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/26/2020 01:34:56</publishTime>
+    </File>
+    <File Include="runtimes/win-arm/native/Microsoft.Data.SqlClient.SNI.pdb">
+      <publishTime>08/26/2020 01:31:56</publishTime>
+    </File>
+    <File Include="runtimes/win-arm64/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/26/2020 01:35:06</publishTime>
+    </File>
+    <File Include="runtimes/win-arm64/native/Microsoft.Data.SqlClient.SNI.pdb">
+      <publishTime>08/26/2020 01:31:56</publishTime>
+    </File>
+    <File Include="runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/26/2020 01:34:56</publishTime>
+    </File>
+    <File Include="runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.pdb">
+      <publishTime>08/26/2020 01:31:56</publishTime>
+    </File>
+    <File Include="runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.dll">
+      <publishTime>08/26/2020 01:34:56</publishTime>
+    </File>
+    <File Include="runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.pdb">
+      <publishTime>08/26/2020 01:31:56</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/netcoreapp3.1/Microsoft.Data.SqlClient.dll">
+      <publishTime>08/26/2020 04:24:48</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/netstandard2.0/System.Runtime.Caching.dll">
+      <publishTime>11/15/2019 13:53:44</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll">
+      <publishTime>11/15/2019 13:53:46</publishTime>
+    </File>
+    <File Include="System.Configuration.ConfigurationManager.dll">
+      <publishTime>11/15/2019 13:37:04</publishTime>
+    </File>
+    <File Include="System.Diagnostics.DiagnosticSource.dll">
+      <publishTime>12/12/2020 07:40:42</publishTime>
+    </File>
+    <File Include="System.IdentityModel.Tokens.Jwt.dll">
+      <publishTime>10/19/2019 04:38:18</publishTime>
+    </File>
+    <File Include="System.Net.Http.Formatting.dll">
+      <publishTime>05/28/2022 04:39:42</publishTime>
+    </File>
+    <File Include="System.Runtime.Caching.dll">
+      <publishTime>11/15/2019 13:37:36</publishTime>
+    </File>
+    <File Include="System.Security.Cryptography.ProtectedData.dll">
+      <publishTime>11/15/2019 13:37:42</publishTime>
+    </File>
+    <File Include="web.config">
+      <publishTime>10/31/2022 12:09:38</publishTime>
+    </File>
+    <File Include="webApiipAweb.deps.json">
+      <publishTime>10/31/2022 12:09:38</publishTime>
+    </File>
+    <File Include="webApiipAweb.dll">
+      <publishTime>10/31/2022 12:09:30</publishTime>
+    </File>
+    <File Include="webApiipAweb.exe">
+      <publishTime>10/31/2022 12:09:30</publishTime>
+    </File>
+    <File Include="webApiipAweb.pdb">
+      <publishTime>10/31/2022 12:09:30</publishTime>
+    </File>
+    <File Include="webApiipAweb.runtimeconfig.json">
+      <publishTime>10/25/2022 11:57:31</publishTime>
+    </File>
+    <File Include="wwwroot/gg.docx">
+      <publishTime>10/25/2022 11:41:23</publishTime>
+    </File>
+  </ItemGroup>
+</Project>
