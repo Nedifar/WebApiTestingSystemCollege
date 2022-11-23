@@ -100,7 +100,7 @@ namespace webApiipAweb.Controllers
                 getProcentChapterDecide = p.getProcentChapter,
                 MainPackProcent = p.getProcentMainTasks,
                 OtherPackProcent = p.getProcentOtherTasks,
-                
+
                 TestPack = p.TestPackExecutions.Select(p => new
                 {
                     Type = p.TestPack.GetPackType(),
@@ -137,14 +137,12 @@ namespace webApiipAweb.Controllers
                 var opened = s.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber).FirstOrDefault();
                 int? id = opened?.idTask ?? closed?.idTask;
                 string imageUrl = String.Empty;
-                using (var http = new HttpClient())
-                {
-                    //var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage/task?name=task{id}.jpeg");
-                    //if (request.StatusCode == System.Net.HttpStatusCode.OK)
-                    //{
-                        imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
-                    //}
-                }
+                //var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage/task?name=task{id}.jpeg");
+                //if (request.StatusCode == System.Net.HttpStatusCode.OK)
+                //{
+                imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
+                //}
+
                 if (closed is not null)
                 {
 
@@ -160,7 +158,11 @@ namespace webApiipAweb.Controllers
                         }),
                         status = closed.GetStatus(),
                         type = closed.TaskWithClosedAnsw.TypesTask.ToString(),
-                        theme = closed.TaskWithClosedAnsw.theme
+                        theme = closed.TaskWithClosedAnsw.theme,
+                        solutions = closed.TaskWithClosedAnsw.Solutions.Select(p => new
+                        {
+                            url = "http://192.168.147.72:83/" + $"sol{p.idSolution}.jpeg"
+                        })
                     });
                 }
 
@@ -173,7 +175,13 @@ namespace webApiipAweb.Controllers
                         selectedAnswear = opened.AnswearResult,
                         status = opened.GetStatus(),
                         type = opened.TaskWithOpenAnsw.TypesTask.ToString(),
-                        theme = opened.TaskWithOpenAnsw.theme
+                        theme = opened.TaskWithOpenAnsw.theme,
+                        solutions = opened.TaskWithOpenAnsw.Solutions.Select(p => new
+                        {
+                            url = "http://192.168.147.72:83/" + $"sol{p.idSolution}.jpeg"
+                        }),
+                        typeResult = opened.TaskWithOpenAnsw.GetResultType(),
+                        modelResult = opened.TaskWithOpenAnsw.htmlModel
                     });
                 }
                 else
@@ -198,7 +206,7 @@ namespace webApiipAweb.Controllers
                 .FirstOrDefault();
             s.AnswearResult = model.answear;
 
-            double mark = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Sum(p=>p.mark);
+            double mark = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Sum(p => p.mark);
             int count = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Count();
 
             string ans = model.answear;
@@ -281,7 +289,7 @@ namespace webApiipAweb.Controllers
                 await context.SaveChangesAsync();
                 return Ok("Ответ верный.");
             }
-            else if(s.mark > 0)
+            else if (s.mark > 0)
             {
                 s.Status = StatusTaskExecution.PartCorrect;
                 await context.SaveChangesAsync();

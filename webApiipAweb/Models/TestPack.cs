@@ -38,8 +38,8 @@ namespace webApiipAweb.Models
 
         public string GetPackType() => this.Type switch
         {
-            TestPackType.MainPack => "Задания основного уровня",
-            TestPackType.OtherPack =>"Дополнительные задания",
+            TestPackType.MainPack => header,
+            TestPackType.OtherPack => header,
             _=>throw new Exception()
         };
     }

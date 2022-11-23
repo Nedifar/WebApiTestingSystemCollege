@@ -45,7 +45,7 @@ namespace webApiipAweb.Models
             {
                 try
                 {
-                    return (int)TestPackExecutions.Where(p=>p.TestPack.Type == TestPackType.OtherPack).FirstOrDefault()?.getProcentChapterDecide;
+                    return (int)TestPackExecutions.Where(p => p.TestPack.Type == TestPackType.OtherPack).Average(p => p.getProcentChapterDecide);
                 }
                 catch
                 {

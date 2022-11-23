@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,9 +12,13 @@ namespace webApiipAweb.Models
     {
         [Key]
         public int idSolution { get; set; }
+
         public string url { get; set; }
+
         [ForeignKey("TaskWithOpenAnsw")]
         public int idTaskWithOpenAnsw { get; set; }
+
+        [JsonIgnore]
         public virtual TaskWithOpenAnsw TaskWithOpenAnsw { get; set; }
     }
 }
