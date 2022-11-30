@@ -120,7 +120,12 @@ namespace webApiipAweb.Controllers
                 theory = p.Chapter.TheoreticalMaterials.Select(l => new
                 {
                     header = l.header,
-                    content = l.content
+                    content = l.content,
+                    resources = l.TheoreticalMaterialResources.Select(s => new
+                    {
+                        header = s.header,
+                        url = "http://192.168.147.72:83/" + s.url
+                    })
                 }),
                 access = p.Chapter.access,
             }));
@@ -217,9 +222,24 @@ namespace webApiipAweb.Controllers
                     {
                         if (count == 1)
                         {
-                            if (s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear != model.answear)
+                            if (s.TaskWithOpenAnsw.ResultType == ResultTypes.Label)
                             {
-                                mark = 0;
+                                if (s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear != model.answear)
+                                {
+                                    mark = 0;
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear.Length; i++)
+                                    if (ans[0] == s.TaskWithOpenAnsw.AnswearOnTaskOpens.FirstOrDefault().answear[i])
+                                    {
+                                        ans = ans.Remove(0, 1);
+                                    }
+                                    else
+                                    {
+                                        mark -= s.TaskWithOpenAnsw.fine;
+                                    }
                             }
                         }
                         else if (count > 1)

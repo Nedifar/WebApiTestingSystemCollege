@@ -19,5 +19,7 @@ namespace webApiipAweb.Models
 
         [JsonIgnore]
         public virtual Chapter Chapter { get; set; }
+
+        public virtual List<TheoreticalMaterialResource> TheoreticalMaterialResources { get; set; } = new List<TheoreticalMaterialResource>();
     }
 }

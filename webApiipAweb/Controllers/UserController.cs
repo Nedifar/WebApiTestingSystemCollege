@@ -413,9 +413,9 @@ namespace webApiipAweb.Controllers
 
         [HttpPost]
         [Route("GetChapterResult")]
-        public async Task<ActionResult> GetChapterResult([FromForm] int idChapterExecution)
+        public async Task<ActionResult> GetChapterResult(PostResultChapetModel model)
         {
-            var chapter = context.ChapterExecutions.Where(p => p.idChapterExecution == idChapterExecution).FirstOrDefault();
+            var chapter = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idChapterExecution).FirstOrDefault();
             if(chapter == null)
             {
                 return BadRequest("Такого выполнения раздела не существует.");
@@ -482,5 +482,10 @@ namespace webApiipAweb.Controllers
     public class GetAppealModel
     {
         public string idChild { get; set; }
+    }
+
+    public class PostResultChapetModel
+    {
+        public int idChapterExecution { get; set; }
     }
 }
