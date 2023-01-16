@@ -92,6 +92,27 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapter(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = await context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToListAsync();
+            var currentSession = s?.FirstOrDefault()
+                ?.SubjectExecution.LevelStudingExecution.Child.SessionChapterExecutions
+                .Where(p => p.idChapter == s?.FirstOrDefault().idChapter)
+                .OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault();
+            if (currentSession == null || currentSession.activeSession == false)
+            {
+                currentSession = new SessionChapterExecution
+                {
+                    activeSession = true,
+                    beginDateTime = DateTime.UtcNow.AddHours(5),
+                    endDateTime = null,
+                    Chapter = s.FirstOrDefault().Chapter,
+                    Child = s?.FirstOrDefault()?.SubjectExecution.LevelStudingExecution.Child
+                };
+                context.SessionChapterExecutions.Add(currentSession);
+                context.SaveChanges();
+            }
+            else
+            {
+
+            }
             return Ok(s.Select(p => new
             {
                 NameChapter = p.Chapter.name,
@@ -124,7 +145,7 @@ namespace webApiipAweb.Controllers
                     resources = l.TheoreticalMaterialResources.Select(s => new
                     {
                         header = s.header,
-                        url = "http://192.168.147.72:83/" + s.url
+                        url = "https://gamification.oksei.ru/imagecontainer/" + s.url
                     })
                 }),
                 access = p.Chapter.access,
@@ -142,15 +163,10 @@ namespace webApiipAweb.Controllers
                 var opened = s.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber).FirstOrDefault();
                 int? id = opened?.idTask ?? closed?.idTask;
                 string imageUrl = String.Empty;
-                //var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage/task?name=task{id}.jpeg");
-                //if (request.StatusCode == System.Net.HttpStatusCode.OK)
-                //{
                 imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
-                //}
 
                 if (closed is not null)
                 {
-
                     return Ok(new
                     {
                         textQuestion = closed.TaskWithClosedAnsw.textQuestion,

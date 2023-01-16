@@ -22,7 +22,8 @@ namespace webApiipAweb
             services.AddDbContext<Models.context>(options => options.UseSqlServer(con).UseLazyLoadingProxies());
             services.AddIdentity<Models.Child, IdentityRole>()
                 .AddEntityFrameworkStores<Models.context>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddRoles<IdentityRole>();
             services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }

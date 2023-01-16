@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webApiipAweb.Models;
 
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    partial class contextModelSnapshot : ModelSnapshot
+    [Migration("20230116070259_SessionModified 4")]
+    partial class SessionModified4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -353,92 +355,6 @@ namespace webApiipAweb.Migrations
                     b.ToTable("ChapterExecutions");
                 });
 
-            modelBuilder.Entity("webApiipAweb.Models.Child", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("firstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("imagePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("lastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("levelStuding")
-                        .HasColumnType("int");
-
-                    b.Property<string>("passRecoveryCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("point")
-                        .HasColumnType("float");
-
-                    b.Property<double>("spendPoint")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers");
-                });
-
             modelBuilder.Entity("webApiipAweb.Models.LevelStuding", b =>
                 {
                     b.Property<int>("idLevelStuding")
@@ -486,10 +402,10 @@ namespace webApiipAweb.Migrations
                     b.Property<bool>("activeSession")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("beginDateTime")
+                    b.Property<DateTime>("beginDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("endDateTime")
+                    b.Property<DateTime>("endDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("idChapter")
@@ -1017,6 +933,105 @@ namespace webApiipAweb.Migrations
                     b.ToTable("TypeAppeals");
                 });
 
+            modelBuilder.Entity("webApiipAweb.Models.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("firstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+                });
+
+            modelBuilder.Entity("webApiipAweb.Models.Child", b =>
+                {
+                    b.HasBaseType("webApiipAweb.Models.User");
+
+                    b.Property<string>("imagePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("levelStuding")
+                        .HasColumnType("int");
+
+                    b.Property<string>("passRecoveryCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("point")
+                        .HasColumnType("float");
+
+                    b.Property<double>("spendPoint")
+                        .HasColumnType("float");
+
+                    b.HasDiscriminator().HasValue("Child");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1028,7 +1043,7 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("webApiipAweb.Models.Child", null)
+                    b.HasOne("webApiipAweb.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1037,7 +1052,7 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("webApiipAweb.Models.Child", null)
+                    b.HasOne("webApiipAweb.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1052,7 +1067,7 @@ namespace webApiipAweb.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("webApiipAweb.Models.Child", null)
+                    b.HasOne("webApiipAweb.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1061,7 +1076,7 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("webApiipAweb.Models.Child", null)
+                    b.HasOne("webApiipAweb.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1485,19 +1500,6 @@ namespace webApiipAweb.Migrations
                     b.Navigation("TestPackExecutions");
                 });
 
-            modelBuilder.Entity("webApiipAweb.Models.Child", b =>
-                {
-                    b.Navigation("AchivmentExecutions");
-
-                    b.Navigation("Appeals");
-
-                    b.Navigation("LevelStudingExecutions");
-
-                    b.Navigation("SessionChapterExecutions");
-
-                    b.Navigation("ThingPackExecutions");
-                });
-
             modelBuilder.Entity("webApiipAweb.Models.LevelStuding", b =>
                 {
                     b.Navigation("Subjects");
@@ -1589,6 +1591,19 @@ namespace webApiipAweb.Migrations
             modelBuilder.Entity("webApiipAweb.Models.TypeAppeal", b =>
                 {
                     b.Navigation("Appeals");
+                });
+
+            modelBuilder.Entity("webApiipAweb.Models.Child", b =>
+                {
+                    b.Navigation("AchivmentExecutions");
+
+                    b.Navigation("Appeals");
+
+                    b.Navigation("LevelStudingExecutions");
+
+                    b.Navigation("SessionChapterExecutions");
+
+                    b.Navigation("ThingPackExecutions");
                 });
 #pragma warning restore 612, 618
         }

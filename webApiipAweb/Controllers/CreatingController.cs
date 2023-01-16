@@ -140,6 +140,13 @@ namespace webApiipAweb.Controllers
             }
         }
 
+        //[HttpPost]
+        //[Route("teacherReg")]
+        //public async Task<ActionResult> RegistrationTeacher()
+        //{
+
+        //}
+
         [HttpPost]
         [Route("DeleteTheory")]
         public async Task<ActionResult> DeleteTheoryForChapter(PostModels.DeleteTheoreticalMaterialModel teoM)
@@ -297,7 +304,7 @@ namespace webApiipAweb.Controllers
                 await context.SaveChangesAsync();
                 var task = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault()
                     .TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault()
-                    .TaskWithOpenAnsws.OrderByDescending(p=>p.idTask).FirstOrDefault();
+                    .TaskWithOpenAnsws.OrderByDescending(p => p.idTask).FirstOrDefault();
                 try
                 {
                     var modelImageSet = new { name = task.idTask, base64 = model.answears }; //????????????
@@ -364,7 +371,7 @@ namespace webApiipAweb.Controllers
                         break;
                     case PostModels.ModeCreating.End:
 
-                        testTask.numericInPack = listTasks.Count+1;
+                        testTask.numericInPack = listTasks.Count + 1;
                         break;
                     case PostModels.ModeCreating.Insert:
                         if (model.numberInList == null)
@@ -372,7 +379,7 @@ namespace webApiipAweb.Controllers
                         for (int i = 0; i < listTasks.Count; i++)
                         {
                             if (model.numberInList - 1 > i)
-                                listTasks[i].numericInPack = i+1;
+                                listTasks[i].numericInPack = i + 1;
                             else
                                 listTasks[i].numericInPack = i + 2;
                         }

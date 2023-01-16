@@ -37,7 +37,7 @@ namespace webApiipAweb.Controllers
             try
             {
                 var child = await _userManager.FindByEmailAsync(signPost.email);
-                var res = await _signInManager.CheckPasswordSignInAsync(child, signPost.pas, false);
+                var res = await _signInManager.PasswordSignInAsync(child, signPost.pas, false, false);
 
                 if (res.Succeeded)
                 {
@@ -61,6 +61,7 @@ namespace webApiipAweb.Controllers
                             levelStuding = p.levelStuding,
                             point = p.point,
                             spendPoint = p.spendPoint,
+                            
                             Appeals = p.Appeals.Select(s => new
                             {
                                 date = s.dateAppeal,
@@ -121,6 +122,7 @@ namespace webApiipAweb.Controllers
                 var result = await _userManager.CreateAsync(ch, model.pas);
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRolesAsync(ch, new string[] {"child"});
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(ch);
                     var callbackUrl = Url.Action(
                         "ConfirmEmail",

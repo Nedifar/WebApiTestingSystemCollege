@@ -15,7 +15,6 @@ namespace webApiipAweb.Models
             
         }
 
-
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<AnswearOnTask> AnswearOnTasks { get; set; }
         public DbSet<ThingPackExecution> ThingPackExecutions { get; set; }
@@ -42,5 +41,7 @@ namespace webApiipAweb.Models
         public DbSet<TypeAppeal> TypeAppeals { get; set; }
         public DbSet<TestPack> TestPacks { get; set; }
         public DbSet<TestPackExecution> TestPackExecutions { get; set; }
+        public DbSet<SessionProgress> SessionProgresses { get; set; }
+        public DbSet<SessionChapterExecution> SessionChapterExecutions { get; set; }
     }
 }

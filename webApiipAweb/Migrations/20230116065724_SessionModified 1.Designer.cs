@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webApiipAweb.Models;
 
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    partial class contextModelSnapshot : ModelSnapshot
+    [Migration("20230116065724_SessionModified 1")]
+    partial class SessionModified1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -486,10 +488,10 @@ namespace webApiipAweb.Migrations
                     b.Property<bool>("activeSession")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("beginDateTime")
+                    b.Property<DateTime>("beginDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("endDateTime")
+                    b.Property<DateTime>("endDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("idChapter")

@@ -9,4 +9,9 @@ namespace webApiipAweb.PostTestModels
     {
         public int idSubjectExecution { get; set; }
     }
+
+    public class EndSessionViewModel
+    {
+        public int idChapterExecution { get; set; }
+    }
 }
