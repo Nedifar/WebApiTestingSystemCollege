@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using webApiipAweb.Auth;
 
 namespace webApiipAweb
 {
@@ -20,10 +22,25 @@ namespace webApiipAweb
         {
             string con = @"Server=192.168.147.72\sqlexpress;User id=sa; pwd=ArbiDOL2+0;Database=GamificationBase;";
             services.AddDbContext<Models.context>(options => options.UseSqlServer(con).UseLazyLoadingProxies());
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = AuthOptions.ISSUER,
+            ValidateAudience = true,
+            ValidAudience = AuthOptions.AUDIENCE,
+            ValidateLifetime = true,
+            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+            ValidateIssuerSigningKey = true,
+        };
+    });
             services.AddIdentity<Models.Child, IdentityRole>()
                 .AddEntityFrameworkStores<Models.context>()
-                .AddDefaultTokenProviders()
-                .AddRoles<IdentityRole>();
+                .AddDefaultTokenProviders();
+
             services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
@@ -35,10 +52,11 @@ namespace webApiipAweb
             //{
             app.UseDeveloperExceptionPage();
             //}
+
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
             app.UseCors(x => x
             .AllowAnyMethod()
             .AllowAnyHeader()

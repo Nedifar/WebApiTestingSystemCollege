@@ -19,10 +19,10 @@ namespace webApiipAweb.Models
 
         public virtual Child Child { get; set; }
 
-        [ForeignKey("Chapter")]
-        public int idChapter { get; set; }
+        [ForeignKey("ChapterExecution")]
+        public int idChapterExecution { get; set; }
 
-        public virtual Chapter Chapter { get; set; }
+        public virtual ChapterExecution ChapterExecution { get; set; }
 
         public virtual List<SessionProgress> SessionProgresses { get; set; } = new List<SessionProgress>();
 

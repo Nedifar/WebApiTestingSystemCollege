@@ -94,7 +94,7 @@ namespace webApiipAweb.Controllers
             var s = await context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToListAsync();
             var currentSession = s?.FirstOrDefault()
                 ?.SubjectExecution.LevelStudingExecution.Child.SessionChapterExecutions
-                .Where(p => p.idChapter == s?.FirstOrDefault().idChapter)
+                .Where(p => p.idChapterExecution == s?.FirstOrDefault().idChapterExecution)
                 .OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault();
             if (currentSession == null || currentSession.activeSession == false)
             {
@@ -103,7 +103,7 @@ namespace webApiipAweb.Controllers
                     activeSession = true,
                     beginDateTime = DateTime.UtcNow.AddHours(5),
                     endDateTime = null,
-                    Chapter = s.FirstOrDefault().Chapter,
+                    ChapterExecution = s.FirstOrDefault(),
                     Child = s?.FirstOrDefault()?.SubjectExecution.LevelStudingExecution.Child
                 };
                 context.SessionChapterExecutions.Add(currentSession);

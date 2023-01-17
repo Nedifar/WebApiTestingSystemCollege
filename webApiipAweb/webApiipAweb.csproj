@@ -7,7 +7,9 @@
   <ItemGroup>
     <PackageReference Include="MailKit" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.17" />
@@ -25,7 +27,7 @@
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
-	<Target Name="CustomActionsBeforePublish" BeforeTargets="BeforePublish">
+	<!--<Target Name="CustomActionsBeforePublish" BeforeTargets="BeforePublish">
 		<Message Text="Before" Importance="high" />
 		<Exec Command="$(_Cmd) $psCred = Get-StoredCredential -Target '192.168.147.72'; Invoke-Command -ComputerName 192.168.147.72 -Credential $psCred -ScriptBlock {Stop-Website -Name GameficationServer}" />
 	</Target>
@@ -36,6 +38,6 @@
 	<PropertyGroup>
 		<_Cmd>"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"</_Cmd>
 
-	</PropertyGroup>
+	</PropertyGroup>-->
 	
 </Project>

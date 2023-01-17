@@ -3,14 +3,22 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
+using webApiipAweb.Auth;
 using webApiipAweb.Email;
+using webApiipAweb.Models;
 
 namespace webApiipAweb.Controllers
 {
@@ -31,38 +39,72 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpPost]
+        [Route("token")]
+        public async Task<ActionResult> GetToken(SignPost signPost)
+        {
+            try
+            {
+                var identity = await GetIdentity(signPost.email, signPost.pas);
+                var child = await _userManager.FindByEmailAsync(signPost.email);
+                if (identity == null)
+                    return BadRequest(new { errorText = "Invalid username or password." });
+                var now = DateTime.UtcNow;
+                var jwt = new JwtSecurityToken(
+                issuer: AuthOptions.ISSUER,
+                audience: AuthOptions.AUDIENCE,
+                notBefore: now,
+                claims: identity,
+                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+                var response = new
+                {
+                    access_token = encodedJwt,
+                    id = identity.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value,
+                };
+                return new JsonResult(response);
+            }
+            catch
+            {
+                return BadRequest(@"-\_/-");
+            }
+        }
+
+        [HttpPost]
         [Route("sign")]
         public async Task<ActionResult<Models.Child>> Sign(SignPost signPost)
         {
             try
             {
                 var child = await _userManager.FindByEmailAsync(signPost.email);
-                var res = await _signInManager.PasswordSignInAsync(child, signPost.pas, false, false);
-
+                var res = await _signInManager.CheckPasswordSignInAsync(child, signPost.pas, false);
                 if (res.Succeeded)
                 {
                     if (await _userManager.IsEmailConfirmedAsync(child))
                     {
-                        string imageUrl  = String.Empty;
+                        //var userId = User.Claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+                        //var child = context.Children.FirstOrDefault(p => p.Id == userId);
+                        string imageUrl = String.Empty;
                         using (var http = new HttpClient())
                         {
                             var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage?name={child.imagePath}");
-                            if(request.StatusCode == System.Net.HttpStatusCode.OK)
+                            if (request.StatusCode == System.Net.HttpStatusCode.OK)
                             {
-                                imageUrl = "http://192.168.147.72:83" + $"img{child.Id}.jpeg";
+                                imageUrl = "http://192.168.147.72:83/" + $"img{child.Id}.jpeg";
                             }
                         }
-                        return Ok(context.Children.Where(p => p.Email == signPost.email).Select(p => new
+                        return Ok(new
                         {
-                            ChildId = p.Id,
-                            firstName = p.firstName,
-                            lastName = p.lastName,
-                            email = p.Email,
-                            levelStuding = p.levelStuding,
-                            point = p.point,
-                            spendPoint = p.spendPoint,
-                            
-                            Appeals = p.Appeals.Select(s => new
+                            ChildId = child.Id,
+                            firstName = child.firstName,
+                            lastName = child.lastName,
+                            email = child.Email,
+                            levelStuding = child.levelStuding,
+                            point = child.point,
+                            spendPoint = child.spendPoint,
+
+                            Appeals = child.Appeals.Select(s => new
                             {
                                 date = s.dateAppeal,
                                 idAppeal = s.idAppeal,
@@ -72,17 +114,10 @@ namespace webApiipAweb.Controllers
                                 type = s.TypeAppeal.typeName
                             }),
                             image = imageUrl
-                        }).FirstOrDefault());
-                    }
-                    else
-                    {
-                        return BadRequest("Подтвердите электронную почту.");
+                        });
                     }
                 }
-                else
-                {
-                    return NotFound("Неверный пароль");
-                }
+                return BadRequest("Неправильный логин email или пароль");
             }
             catch
             {
@@ -122,7 +157,7 @@ namespace webApiipAweb.Controllers
                 var result = await _userManager.CreateAsync(ch, model.pas);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRolesAsync(ch, new string[] {"child"});
+                    await _userManager.AddToRolesAsync(ch, new string[] { "child" });
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(ch);
                     var callbackUrl = Url.Action(
                         "ConfirmEmail",
@@ -166,7 +201,7 @@ namespace webApiipAweb.Controllers
                         try
                         {
                             var modelImageSet = new { name = profileModel.idUser, base64 = profileModel.base64image };
-                            using(var http = new HttpClient())
+                            using (var http = new HttpClient())
                             {
                                 var request = await http.PostAsync("http://192.168.147.72:83/api/userprofileimage", modelImageSet, new JsonMediaTypeFormatter());
                                 result.imagePath = $"images/img{profileModel.idUser}.jpeg";
@@ -418,7 +453,7 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapterResult(PostResultChapetModel model)
         {
             var chapter = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idChapterExecution).FirstOrDefault();
-            if(chapter == null)
+            if (chapter == null)
             {
                 return BadRequest("Такого выполнения раздела не существует.");
             }
@@ -434,10 +469,40 @@ namespace webApiipAweb.Controllers
                     }),
                     Test = p.TryingTestTasks.OrderByDescending(p => p.result).FirstOrDefault()?.TestTaskExecutions.Select(s => new
                     {
-                        number = p.TryingTestTasks.OrderByDescending(p => p.result).FirstOrDefault().TestTaskExecutions.IndexOf(s)+1,
+                        number = p.TryingTestTasks.OrderByDescending(p => p.result).FirstOrDefault().TestTaskExecutions.IndexOf(s) + 1,
                         status = s.GetStatus()
                     })
                 }));
+            }
+        }
+
+        private async Task<List<Claim>> GetIdentity(string email, string password)
+        {
+            var child = context.Children.FirstOrDefault(c => c.Email == email);
+            var res = await _signInManager.CheckPasswordSignInAsync(child, password, false);
+            if (res.Succeeded)
+            {
+                if (await _userManager.IsEmailConfirmedAsync(child))
+                {
+                    var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, child.Id),
+
+                };
+                    foreach (var role in await _userManager.GetRolesAsync(child))
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
+                    return claims;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
             }
         }
     }

@@ -24,6 +24,8 @@ namespace webApiipAweb.Models
 
         public virtual List<TestPackExecution> TestPackExecutions { get; set; } = new List<TestPackExecution>();
 
+        public virtual List<SessionChapterExecution> SessionChapterExecutions { get; set; } = new List<SessionChapterExecution>();
+
         public int getProcentChapter
         {
             get

@@ -188,7 +188,7 @@ namespace webApiipAweb.Controllers
                 {
                     return BadRequest("Данного класса, предмета или раздела не существует.");
                 }
-                var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
+                var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName && p.name == model.chapterName).FirstOrDefault();
                 if (selected.TestPacks.Where(p => p.header == model.header).FirstOrDefault() != null)
                 {
                     return BadRequest("Данная тестовая коллекция уже существует.");

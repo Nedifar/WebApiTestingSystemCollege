@@ -492,7 +492,7 @@ namespace webApiipAweb.Migrations
                     b.Property<DateTime?>("endDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("idChapter")
+                    b.Property<int>("idChapterExecution")
                         .HasColumnType("int");
 
                     b.Property<string>("idChild")
@@ -500,7 +500,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasKey("idSessionChapterExecution");
 
-                    b.HasIndex("idChapter");
+                    b.HasIndex("idChapterExecution");
 
                     b.HasIndex("idChild");
 
@@ -1205,9 +1205,9 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.SessionChapterExecution", b =>
                 {
-                    b.HasOne("webApiipAweb.Models.Chapter", "Chapter")
+                    b.HasOne("webApiipAweb.Models.ChapterExecution", "ChapterExecution")
                         .WithMany("SessionChapterExecutions")
-                        .HasForeignKey("idChapter")
+                        .HasForeignKey("idChapterExecution")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1215,7 +1215,7 @@ namespace webApiipAweb.Migrations
                         .WithMany("SessionChapterExecutions")
                         .HasForeignKey("idChild");
 
-                    b.Navigation("Chapter");
+                    b.Navigation("ChapterExecution");
 
                     b.Navigation("Child");
                 });
@@ -1473,8 +1473,6 @@ namespace webApiipAweb.Migrations
                 {
                     b.Navigation("ChapterExecutions");
 
-                    b.Navigation("SessionChapterExecutions");
-
                     b.Navigation("TestPacks");
 
                     b.Navigation("TheoreticalMaterials");
@@ -1482,6 +1480,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.ChapterExecution", b =>
                 {
+                    b.Navigation("SessionChapterExecutions");
+
                     b.Navigation("TestPackExecutions");
                 });
 

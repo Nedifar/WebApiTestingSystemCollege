@@ -30,6 +30,5 @@ namespace webApiipAweb.Models
 
         public virtual List<TheoreticalMaterial> TheoreticalMaterials { get; set; } = new List<TheoreticalMaterial>();
 
-        public virtual List<SessionChapterExecution> SessionChapterExecutions { get; set; } = new List<SessionChapterExecution>();
     }
 }
