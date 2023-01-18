@@ -364,3 +364,9 @@ C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\refin
 C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\webApiipAweb.pdb
 C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\webApiipAweb.genruntimeconfig.cache
 C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\ref\webApiipAweb.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Microsoft.AspNetCore.Identity.UI.Views.V4.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Microsoft.AspNetCore.Identity.UI.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Microsoft.Extensions.FileProviders.Embedded.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\webApiipAweb.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\staticwebassets\webApiipAweb.StaticWebAssets.xml

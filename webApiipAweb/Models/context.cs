@@ -43,5 +43,10 @@ namespace webApiipAweb.Models
         public DbSet<TestPackExecution> TestPackExecutions { get; set; }
         public DbSet<SessionProgress> SessionProgresses { get; set; }
         public DbSet<SessionChapterExecution> SessionChapterExecutions { get; set; }
+        public DbSet<School> Schools { get; set; }
+        public DbSet<Region> Regions { get; set; }
+        public DbSet<Municipality> Municipalities { get; set; }
+        public DbSet<Area> Areas { get; set; }
+
     }
 }

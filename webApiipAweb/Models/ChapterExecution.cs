@@ -32,7 +32,14 @@ namespace webApiipAweb.Models
             {
                 try
                 {
-                    return (int)(getProcentOtherTasks+ getProcentMainTasks)/2;
+                    if (TestPackExecutions.Where(p => p.TestPack.Type == TestPackType.OtherPack).Count() != 0)
+                    {
+                        return (int)(getProcentOtherTasks + getProcentMainTasks) / 2;
+                    }
+                    else
+                    {
+                        return (int)getProcentMainTasks;
+                    }
                 }
                 catch
                 {
@@ -51,7 +58,7 @@ namespace webApiipAweb.Models
                 }
                 catch
                 {
-                    return 0;
+                    return 100;
                 }
             }
         }

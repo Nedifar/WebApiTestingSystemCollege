@@ -44,5 +44,15 @@ namespace webApiipAweb.Models
         public virtual List<Appeal> Appeals { get; set; } = new List<Appeal>();
 
         public virtual List<SessionChapterExecution> SessionChapterExecutions { get; set; } = new List<SessionChapterExecution>();
+
+        [ForeignKey("School")]
+        public int? idSchool { get; set; }
+
+        public virtual School School { get; set; }
+
+        [ForeignKey("Municipality")]
+        public int? idMunicipality { get; set; }
+
+        public virtual Municipality Municipality { get; set; }
     }
 }

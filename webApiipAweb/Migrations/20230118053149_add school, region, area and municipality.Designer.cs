@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using webApiipAweb.Models;
 
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    partial class contextModelSnapshot : ModelSnapshot
+    [Migration("20230118053149_add school, region, area and municipality")]
+    partial class addschoolregionareaandmunicipality
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,7 +324,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasIndex("idRegion");
 
-                    b.ToTable("Areas");
+                    b.ToTable("Area");
                 });
 
             modelBuilder.Entity("webApiipAweb.Models.Chapter", b =>
@@ -523,7 +525,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasIndex("idArea");
 
-                    b.ToTable("Municipalities");
+                    b.ToTable("Municipality");
                 });
 
             modelBuilder.Entity("webApiipAweb.Models.Region", b =>
@@ -538,7 +540,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasKey("idRegion");
 
-                    b.ToTable("Regions");
+                    b.ToTable("Region");
                 });
 
             modelBuilder.Entity("webApiipAweb.Models.School", b =>
@@ -558,7 +560,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasIndex("idMunicipality");
 
-                    b.ToTable("Schools");
+                    b.ToTable("School");
                 });
 
             modelBuilder.Entity("webApiipAweb.Models.SessionChapterExecution", b =>
