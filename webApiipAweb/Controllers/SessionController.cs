@@ -25,6 +25,13 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpPost]
+        [Route("EndTheorySession")]
+        public async Task<ActionResult> EndTheorySession(PostTestModels.EndSessionViewModel endSession)
+        {
+            
+        }
+
+        [HttpPost]
         [Route("EndSession")]
         public async Task<ActionResult> EndSession(PostTestModels.EndSessionViewModel endSession)
         {
@@ -110,6 +117,72 @@ namespace webApiipAweb.Controllers
                                 
                             }),
                             FinishResults = chapter.SessionChapterExecutions.OrderByDescending(p=>p.idSessionChapterExecution).FirstOrDefault()
+                            ?.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
+                            {
+                                taskNumber = sessionProgress.taskNumber,
+                                status = sessionProgress.GetStatus() == "Ожидает выполнения" ? "Решено неверно" : sessionProgress.GetStatus()
+                            })
+                        })
+                    })
+                })
+            }));
+        }
+
+        [Route("getSessionsOnSchool")]
+        [Authorize(Roles = "AdminSchool")]
+        public async Task<ActionResult> GetSessionsOnSchool()
+        {
+            var childs = context.Children.ToList();
+            var sessions = await context.SessionChapterExecutions.ToListAsync();
+            foreach (var session in sessions.Where(p => p.activeSession))
+            {
+                if (session.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
+                {
+                    session.activeSession = false;
+                    session.endDateTime = session.beginDateTime.Value.AddHours(1);
+                    var selectedChapterExecution = session.ChapterExecution;
+                    var taskExecution = selectedChapterExecution.TestPackExecutions.FirstOrDefault().GetTasksExecution();
+                    int counter = 1;
+                    foreach (var task in taskExecution)
+                    {
+                        session.SessionProgresses.Add(new()
+                        {
+                            taskNumber = counter,
+                            StatusTaskExecution = task.Status
+                        });
+                        counter++;
+                    }
+                }
+            }
+            context.SaveChanges();
+            return Ok(childs.Select(child => new
+            {
+                child = child.lastName + " " + child.firstName,
+                level = child.LevelStudingExecutions.Select(level => new
+                {
+                    level = level.LevelStuding.nameLevel,
+                    subject = level.SubjectExecutions.Select(subject => new
+                    {
+                        name = subject.Subject.nameSubject,
+                        chapter = subject.ChapterExecutions.Select(chapter => new
+                        {
+                            name = chapter.Chapter.name,
+                            sessions = chapter.SessionChapterExecutions.Select(session => new
+                            {
+                                beginDateTime = session.beginDateTime,
+                                endDateTime = session.endDateTime,
+                                timeExecution = ((session.endDateTime ?? DateTime.UtcNow.AddHours(5)) - session.beginDateTime).Value,
+                                status = session.activeSession ? "Активна" : "Завершена",
+                                nameChapter = session.ChapterExecution.Chapter.name,
+
+                                SessionProgresses = session.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
+                                {
+                                    taskNumber = sessionProgress.taskNumber,
+                                    status = sessionProgress.GetStatus()
+                                }),
+
+                            }),
+                            FinishResults = chapter.SessionChapterExecutions.OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault()
                             ?.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
                             {
                                 taskNumber = sessionProgress.taskNumber,

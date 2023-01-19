@@ -73,12 +73,13 @@ namespace webApiipAweb.Controllers
 
         [HttpPost]
         [Route("sign")]
-        public async Task<ActionResult<Models.Child>> Sign(SignPost signPost)
+        public async Task<ActionResult<Child>> Sign(SignPost signPost)
         {
             try
             {
                 var child = await _userManager.FindByEmailAsync(signPost.email);
                 var res = await _signInManager.CheckPasswordSignInAsync(child, signPost.pas, false);
+                var roles = await _userManager.GetRolesAsync(child);
                 if (res.Succeeded)
                 {
                     if (await _userManager.IsEmailConfirmedAsync(child))
@@ -119,9 +120,9 @@ namespace webApiipAweb.Controllers
                 }
                 return BadRequest("Неправильный логин email или пароль");
             }
-            catch
+            catch(Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,19 +8,59 @@ using System.Threading.Tasks;
 
 namespace webApiipAweb.Models
 {
-    public class context : IdentityDbContext<Child>
+    public class context : IdentityDbContext<
+        Child, ApplicationRole, string,
+        IdentityUserClaim<string>, ApplicationUserRole, IdentityUserLogin<string>,
+        IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public context(DbContextOptions<context> options) : base(options) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
+
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<Child>(b =>
+            {
+                b.HasMany(e => e.Claims)
+               .WithOne()
+               .HasForeignKey(uc => uc.UserId)
+               .IsRequired();
+
+                // Each User can have many UserLogins
+                b.HasMany(e => e.Logins)
+                    .WithOne()
+                    .HasForeignKey(ul => ul.UserId)
+                    .IsRequired();
+
+                // Each User can have many UserTokens
+                b.HasMany(e => e.Tokens)
+                    .WithOne()
+                    .HasForeignKey(ut => ut.UserId)
+                    .IsRequired();
+                b.HasMany(e => e.UserRoles)
+               .WithOne(e => e.User)
+               .HasForeignKey(ur => ur.UserId)
+               .IsRequired();
+            });
+
+            builder.Entity<ApplicationRole>(b =>
+            {
+                // Each Role can have many entries in the UserRole join table
+                b.HasMany(e => e.UserRoles)
+                    .WithOne(e => e.Role)
+                    .HasForeignKey(ur => ur.RoleId)
+                    .IsRequired();
+            });
         }
 
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<AnswearOnTask> AnswearOnTasks { get; set; }
         public DbSet<ThingPackExecution> ThingPackExecutions { get; set; }
-        public DbSet<ThingExecution> ThingExecutions{ get; set; }
-        public DbSet<ThingPack> ThingPacks{ get; set; }
+        public DbSet<ThingExecution> ThingExecutions { get; set; }
+        public DbSet<ThingPack> ThingPacks { get; set; }
         public DbSet<Child> Children { get; set; }
         public DbSet<Thing> Things { get; set; }
         public DbSet<Achivment> Achivments { get; set; }

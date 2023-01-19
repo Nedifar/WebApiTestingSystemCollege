@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using webApiipAweb.Auth;
+using webApiipAweb.Models;
 
 namespace webApiipAweb
 {
@@ -37,7 +38,7 @@ namespace webApiipAweb
             ValidateIssuerSigningKey = true,
         };
     });
-            services.AddIdentity<Models.Child, IdentityRole>()
+            services.AddIdentity<Models.Child, ApplicationRole>()
                 .AddEntityFrameworkStores<Models.context>()
                 .AddDefaultTokenProviders();
 
