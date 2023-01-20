@@ -24,7 +24,7 @@ namespace webApiipAweb.Email
             using (var client = new SmtpClient())
             {
                 await client.ConnectAsync("smtp.mail.ru", 465, true);
-                await client.AuthenticateAsync("ilnaz.gazimov@mail.ru", "UXEm9IvzkGbsZXFxNqM0");
+                await client.AuthenticateAsync("ilnaz.gazimov@mail.ru", "SwGRz5YUfbRYaxpEvdGN");
                 await client.SendAsync(emailMessage);
 
                 await client.DisconnectAsync(true);

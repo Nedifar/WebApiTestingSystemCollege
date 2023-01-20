@@ -28,7 +28,7 @@ namespace webApiipAweb.Controllers
         [Route("EndTheorySession")]
         public async Task<ActionResult> EndTheorySession(PostTestModels.EndSessionViewModel endSession)
         {
-            
+            return Ok();
         }
 
         [HttpPost]
