@@ -159,7 +159,10 @@ namespace webApiipAweb.Controllers
                 int? id = opened?.idTask ?? closed?.idTask;
                 string imageUrl = String.Empty;
                 imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
-
+                var timeNow = DateTime.UtcNow.AddHours(5);
+                var currentTime = (new DateTime(timeNow.Year, timeNow.Month, timeNow.Day+1, 0, 0, 0) - timeNow).Hours + "ч " + (new DateTime(timeNow.Year, timeNow.Month, timeNow.Day + 1, 0, 0, 0) - timeNow).Minutes + "мин";
+                if ((new DateTime(timeNow.Year, timeNow.Month, timeNow.Day + 1, 0, 0, 0) - timeNow).Hours == 0)
+                    currentTime = currentTime.Replace("0ч ", "");
                 if (closed is not null)
                 {
                     return Ok(new
@@ -173,13 +176,13 @@ namespace webApiipAweb.Controllers
                             idAnswear = p.idAnswearOnTask
                         }),
                         locked = closed.lockedTime > DateTime.UtcNow.AddHours(5) ? true : false,
-                        lockedTime = (closed.lockedTime - DateTime.UtcNow.AddHours(5)).Hours + ":" + (closed.lockedTime - DateTime.UtcNow.AddHours(5)).Minutes,
+                        lockedTime = currentTime,
                         status = closed.GetStatus(),
                         type = closed.TaskWithClosedAnsw.TypesTask.ToString(),
                         theme = closed.TaskWithClosedAnsw.theme,
                         solutions = closed.TaskWithClosedAnsw.Solutions.Select(p => new
                         {
-                            url = "http://192.168.147.72:83/" + $"sol{p.idSolution}.jpeg"
+                            url = "http://192.168.147.72:83/" + $"{p.url.Replace("images/", "")}"
                         })
                     });
                 }
@@ -195,10 +198,10 @@ namespace webApiipAweb.Controllers
                         theme = opened.TaskWithOpenAnsw.theme,
                         solutions = opened.TaskWithOpenAnsw.Solutions.Select(p => new
                         {
-                            url = "http://192.168.147.72:83/" + $"sol{p.idSolution}.jpeg"
+                            url = "http://192.168.147.72:83/" + $"{p.url.Replace("images/", "")}"
                         }),
                         locked = opened.lockedTime > DateTime.UtcNow.AddHours(5) ? true : false,
-                        lockedTime = (opened.lockedTime - DateTime.UtcNow.AddHours(5)).Hours + ":"+ (opened.lockedTime - DateTime.UtcNow.AddHours(5)).Minutes,
+                        lockedTime = currentTime,
                         typeResult = opened.TaskWithOpenAnsw.GetResultType(),
                         modelResult = opened.TaskWithOpenAnsw.htmlModel
                     });
