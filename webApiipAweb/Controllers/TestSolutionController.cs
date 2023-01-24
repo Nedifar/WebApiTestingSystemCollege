@@ -16,12 +16,8 @@ namespace webApiipAweb.Controllers
     public class TestSolutionController : ControllerBase
     {
         private Models.context context;
-        private readonly UserManager<Models.Child> _userManager;
-        private readonly SignInManager<Models.Child> _signInManager;
-        public TestSolutionController(Models.context _context, UserManager<Models.Child> userManager, SignInManager<Models.Child> signInManager)
+        public TestSolutionController(Models.context _context)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             context = _context;
         }
 
@@ -91,38 +87,37 @@ namespace webApiipAweb.Controllers
         [Route("getChapter")]
         public async Task<ActionResult> GetChapter(PostTestModels.GetChaptersPost chaptersPost)
         {
-            var s = await context.ChapterExecutions.Where(p => p.idChapterExecution == chaptersPost.idSubjectExecution).ToListAsync();
-            var currentSession = s?.FirstOrDefault()
-                ?.SubjectExecution.LevelStudingExecution.Child.SessionChapterExecutions
-                .Where(p => p.idChapterExecution == s?.FirstOrDefault().idChapterExecution)
-                .OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault();
-            if (currentSession == null || currentSession.activeSession == false)
+            var s = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == chaptersPost.idSubjectExecution);
+            var currentTheorySession = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == s.idChapterExecution)
+                .TheorySessions.OrderByDescending(p => p.idTheorySession).FirstOrDefault();
+            if (currentTheorySession != null && currentTheorySession.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
             {
-                currentSession = new SessionChapterExecution
+                currentTheorySession.active = false;
+                currentTheorySession.endDate = currentTheorySession.beginDate.Value.AddHours(1);
+            }
+            if (currentTheorySession == null || currentTheorySession.active == false)
+            {
+                currentTheorySession = new TheorySession
                 {
-                    activeSession = true,
-                    beginDateTime = DateTime.UtcNow.AddHours(5),
-                    endDateTime = null,
-                    ChapterExecution = s.FirstOrDefault(),
-                    Child = s?.FirstOrDefault()?.SubjectExecution.LevelStudingExecution.Child
+                    active = true,
+                    beginDate = DateTime.UtcNow.AddHours(5),
+                    endDate = null,
+                    ChapterExecution = s,
+                    Child = s?.SubjectExecution.LevelStudingExecution.Child
                 };
-                context.SessionChapterExecutions.Add(currentSession);
+                context.TheorySessions.Add(currentTheorySession);
                 context.SaveChanges();
             }
-            else
+            return Ok(new
             {
+                NameChapter = s.Chapter.name,
+                Description = s.Chapter.Description,
+                idExec = s.idChapterExecution,
+                getProcentChapterDecide = s.getProcentChapter,
+                MainPackProcent = s.getProcentMainTasks,
+                OtherPackProcent = s.getProcentOtherTasks,
 
-            }
-            return Ok(s.Select(p => new
-            {
-                NameChapter = p.Chapter.name,
-                Description = p.Chapter.Description,
-                idExec = p.idChapterExecution,
-                getProcentChapterDecide = p.getProcentChapter,
-                MainPackProcent = p.getProcentMainTasks,
-                OtherPackProcent = p.getProcentOtherTasks,
-
-                TestPack = p.TestPackExecutions.Select(p => new
+                TestPack = s.TestPackExecutions.Select(p => new
                 {
                     Type = p.TestPack.GetPackType(),
                     Header = p.TestPack.header,
@@ -138,7 +133,7 @@ namespace webApiipAweb.Controllers
                         theme = l.themes
                     })
                 }),
-                theory = p.Chapter.TheoreticalMaterials.Select(l => new
+                theory = s.Chapter.TheoreticalMaterials.Select(l => new
                 {
                     header = l.header,
                     content = l.content,
@@ -148,8 +143,8 @@ namespace webApiipAweb.Controllers
                         url = "https://gamification.oksei.ru/imagecontainer/" + s.url
                     })
                 }),
-                access = p.Chapter.access,
-            }));
+                access = s.Chapter.access,
+            });
         }
 
         [HttpPost]
@@ -177,6 +172,8 @@ namespace webApiipAweb.Controllers
                             text = p.textAnswear,
                             idAnswear = p.idAnswearOnTask
                         }),
+                        locked = closed.lockedTime > DateTime.UtcNow.AddHours(5) ? true : false,
+                        lockedTime = (closed.lockedTime - DateTime.UtcNow.AddHours(5)).Hours + ":" + (closed.lockedTime - DateTime.UtcNow.AddHours(5)).Minutes,
                         status = closed.GetStatus(),
                         type = closed.TaskWithClosedAnsw.TypesTask.ToString(),
                         theme = closed.TaskWithClosedAnsw.theme,
@@ -186,7 +183,6 @@ namespace webApiipAweb.Controllers
                         })
                     });
                 }
-
                 else if (opened is not null)
                 {
                     return Ok(new
@@ -201,6 +197,8 @@ namespace webApiipAweb.Controllers
                         {
                             url = "http://192.168.147.72:83/" + $"sol{p.idSolution}.jpeg"
                         }),
+                        locked = opened.lockedTime > DateTime.UtcNow.AddHours(5) ? true : false,
+                        lockedTime = (opened.lockedTime - DateTime.UtcNow.AddHours(5)).Hours + ":"+ (opened.lockedTime - DateTime.UtcNow.AddHours(5)).Minutes,
                         typeResult = opened.TaskWithOpenAnsw.GetResultType(),
                         modelResult = opened.TaskWithOpenAnsw.htmlModel
                     });
@@ -318,7 +316,7 @@ namespace webApiipAweb.Controllers
             if (mark < 0)
                 mark = 0;
             s.mark = mark;
-
+            var date = DateTime.UtcNow.AddHours(5).AddDays(1).Date;
             if (s.mark == s.TaskWithOpenAnsw.AnswearOnTaskOpens.Sum(p => p.mark))
             {
                 s.Status = StatusTaskExecution.Correct;
@@ -328,10 +326,12 @@ namespace webApiipAweb.Controllers
             else if (s.mark > 0)
             {
                 s.Status = StatusTaskExecution.PartCorrect;
+                s.lockedTime = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
                 await context.SaveChangesAsync();
                 return Ok("Ответ частично верный.");
             }
             s.Status = StatusTaskExecution.InCorrect;
+            s.lockedTime = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
             await context.SaveChangesAsync();
             return BadRequest("Ответ неверный");
         }

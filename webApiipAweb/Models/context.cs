@@ -88,6 +88,6 @@ namespace webApiipAweb.Models
         public DbSet<Region> Regions { get; set; }
         public DbSet<Municipality> Municipalities { get; set; }
         public DbSet<Area> Areas { get; set; }
-
+        public DbSet<TheorySession> TheorySessions { get; set; }
     }
 }

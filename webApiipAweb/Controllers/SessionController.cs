@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using webApiipAweb.Models;
 using static System.Collections.Specialized.BitVector32;
 
 namespace webApiipAweb.Controllers
@@ -28,6 +29,16 @@ namespace webApiipAweb.Controllers
         [Route("EndTheorySession")]
         public async Task<ActionResult> EndTheorySession(PostTestModels.EndSessionViewModel endSession)
         {
+            var currentChapterExecution = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == endSession.idChapterExecution);
+            if (currentChapterExecution == null)
+                return NotFound("Такого раздела не существует.");
+            var currentSession = currentChapterExecution.TheorySessions.OrderByDescending(p => p.idTheorySession)
+                .FirstOrDefault(p=>p.active);
+            if (currentSession == null)
+                return NotFound("Активной сессии не существует.");
+            currentSession.active = false;
+            currentSession.endDate = DateTime.UtcNow.AddHours(5);
+            await context.SaveChangesAsync();
             return Ok();
         }
 
@@ -62,7 +73,6 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpGet]
-
         [Route("getSessions")]
         public async Task<ActionResult> GetAllSessions()
         {
@@ -128,6 +138,74 @@ namespace webApiipAweb.Controllers
             }));
         }
 
+        [HttpGet]
+        [Route("getsessionstheory")]
+        public async Task<ActionResult> GetAllSessionsToTheory()
+        {
+            var childs = context.Children.ToList();
+            var sessions = await context.TheorySessions.ToListAsync();
+            foreach (var session in sessions.Where(p => p.active))
+            {
+                if (session.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
+                {
+                    session.active = false;
+                    session.endDate = session.beginDate.Value.AddHours(1);
+                }
+            }
+            context.SaveChanges();
+            return Ok(childs.Select(child => new
+            {
+                child = child.lastName + " " + child.firstName,
+                level = child.LevelStudingExecutions.Select(level => new
+                {
+                    level = level.LevelStuding.nameLevel,
+                    subject = level.SubjectExecutions.Select(subject => new
+                    {
+                        name = subject.Subject.nameSubject,
+                        chapter = subject.ChapterExecutions.Select(chapter => new
+                        {
+                            name = chapter.Chapter.name,
+                            sessions = chapter.TheorySessions.Select(session => new
+                            {
+                                beginDateTime = session.beginDate,
+                                endDateTime = session.endDate,
+                                timeExecution = ((session.endDate ?? DateTime.UtcNow.AddHours(5)) - session.beginDate).Value,
+                                status = session.active ? "Активна" : "Завершена",
+                                nameChapter = session.ChapterExecution.Chapter.name,
+                            }),
+                        })
+                    })
+                })
+            }));
+        }
+
+        [HttpPost]
+        [Route("StartTaskSession")]
+        public async Task<ActionResult> StartTaskSession(PostTestModels.EndSessionViewModel startSession)
+        {
+            var s = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == startSession.idChapterExecution);
+            var currentSession = s.SessionChapterExecutions
+                .OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault();
+            if (currentSession != null && currentSession.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
+            {
+                currentSession.activeSession = false;
+                currentSession.endDateTime = currentSession.beginDateTime.Value.AddHours(1);
+            }
+            if (currentSession == null || currentSession.activeSession == false)
+            {
+                currentSession = new SessionChapterExecution
+                {
+                    activeSession = true,
+                    beginDateTime = DateTime.UtcNow.AddHours(5),
+                    endDateTime = null,
+                    ChapterExecution = s,
+                    Child = s?.SubjectExecution.LevelStudingExecution.Child
+                };
+                context.SessionChapterExecutions.Add(currentSession);
+                context.SaveChanges();
+            }
+            return Ok();
+        }
         [Route("getSessionsOnSchool")]
         [Authorize(Roles = "AdminSchool")]
         public async Task<ActionResult> GetSessionsOnSchool()

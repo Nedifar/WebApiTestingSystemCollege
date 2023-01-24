@@ -31,6 +31,8 @@ namespace webApiipAweb.Models
 
         public int timeExecutionInSecond { get; set; }
 
+        public DateTime lockedTime { get; set; } = new DateTime(1970, 1, 1);
+
         public string GetStatus() => this.Status switch
         {
             StatusTaskExecution.AwaitingExecution => "Ожидает выполнения",

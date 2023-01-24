@@ -26,6 +26,8 @@ namespace webApiipAweb.Models
 
         public virtual List<SessionChapterExecution> SessionChapterExecutions { get; set; } = new List<SessionChapterExecution>();
 
+        public virtual List<TheorySession> TheorySessions { get; set; } = new List<TheorySession>();
+
         public int getProcentChapter
         {
             get
