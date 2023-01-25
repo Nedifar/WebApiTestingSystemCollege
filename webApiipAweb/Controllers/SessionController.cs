@@ -80,7 +80,7 @@ namespace webApiipAweb.Controllers
             var sessions = await context.SessionChapterExecutions.ToListAsync();
             foreach (var session in sessions.Where(p => p.activeSession))
             {
-                if (session.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
+                if (session.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && session.activeSession)
                 {
                     session.activeSession = false;
                     session.endDateTime = session.beginDateTime.Value.AddHours(1);
@@ -146,7 +146,7 @@ namespace webApiipAweb.Controllers
             var sessions = await context.TheorySessions.ToListAsync();
             foreach (var session in sessions.Where(p => p.active))
             {
-                if (session.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
+                if (session.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && session.active)
                 {
                     session.active = false;
                     session.endDate = session.beginDate.Value.AddHours(1);
@@ -180,16 +180,56 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpPost]
+        [Route("StartTheorySession")]
+        public async Task<ActionResult> StartTheorySession(PostTestModels.EndSessionViewModel startTheorySession)
+        {
+            var s = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == startTheorySession.idChapterExecution);
+            var currentTheorySession = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == s.idChapterExecution)
+                .TheorySessions.OrderByDescending(p => p.idTheorySession).FirstOrDefault();
+            if (currentTheorySession != null && currentTheorySession.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && currentTheorySession.active)
+            {
+                currentTheorySession.active = false;
+                currentTheorySession.endDate = currentTheorySession.beginDate.Value.AddHours(1);
+            }
+            if (currentTheorySession == null || currentTheorySession.active == false)
+            {
+                currentTheorySession = new TheorySession
+                {
+                    active = true,
+                    beginDate = DateTime.UtcNow.AddHours(5),
+                    endDate = null,
+                    ChapterExecution = s,
+                    Child = s?.SubjectExecution.LevelStudingExecution.Child
+                };
+                context.TheorySessions.Add(currentTheorySession);
+                context.SaveChanges();
+            }
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("StartTaskSession")]
         public async Task<ActionResult> StartTaskSession(PostTestModels.EndSessionViewModel startSession)
         {
             var s = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == startSession.idChapterExecution);
             var currentSession = s.SessionChapterExecutions
                 .OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault();
-            if (currentSession != null && currentSession.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
+            if (currentSession != null && currentSession.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && currentSession.activeSession)
             {
                 currentSession.activeSession = false;
                 currentSession.endDateTime = currentSession.beginDateTime.Value.AddHours(1);
+                var selectedChapterExecution = currentSession.ChapterExecution;
+                var taskExecution = selectedChapterExecution.TestPackExecutions.FirstOrDefault().GetTasksExecution();
+                int counter = 1;
+                foreach (var task in taskExecution)
+                {
+                    currentSession.SessionProgresses.Add(new()
+                    {
+                        taskNumber = counter,
+                        StatusTaskExecution = task.Status
+                    });
+                    counter++;
+                }
             }
             if (currentSession == null || currentSession.activeSession == false)
             {
@@ -214,7 +254,7 @@ namespace webApiipAweb.Controllers
             var sessions = await context.SessionChapterExecutions.ToListAsync();
             foreach (var session in sessions.Where(p => p.activeSession))
             {
-                if (session.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
+                if (session.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && session.activeSession)
                 {
                     session.activeSession = false;
                     session.endDateTime = session.beginDateTime.Value.AddHours(1);

@@ -88,26 +88,7 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapter(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == chaptersPost.idSubjectExecution);
-            var currentTheorySession = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == s.idChapterExecution)
-                .TheorySessions.OrderByDescending(p => p.idTheorySession).FirstOrDefault();
-            if (currentTheorySession != null && currentTheorySession.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5))
-            {
-                currentTheorySession.active = false;
-                currentTheorySession.endDate = currentTheorySession.beginDate.Value.AddHours(1);
-            }
-            if (currentTheorySession == null || currentTheorySession.active == false)
-            {
-                currentTheorySession = new TheorySession
-                {
-                    active = true,
-                    beginDate = DateTime.UtcNow.AddHours(5),
-                    endDate = null,
-                    ChapterExecution = s,
-                    Child = s?.SubjectExecution.LevelStudingExecution.Child
-                };
-                context.TheorySessions.Add(currentTheorySession);
-                context.SaveChanges();
-            }
+
             return Ok(new
             {
                 NameChapter = s.Chapter.name,
