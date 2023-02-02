@@ -14,6 +14,7 @@ namespace webApiipAweb.Models
         public int idTheoreticalMaterial { get; set; }
         public string header { get; set; }
         public string content { get; set; }
+        public string additionalMaterial { get; set; }
         [ForeignKey("Chapter")]
         public int idChapter { get; set; }
 

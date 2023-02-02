@@ -118,6 +118,7 @@ namespace webApiipAweb.Controllers
                 {
                     header = l.header,
                     content = l.content,
+                    additionalMaterial = l.additionalMaterial,
                     resources = l.TheoreticalMaterialResources.Select(s => new
                     {
                         header = s.header,
