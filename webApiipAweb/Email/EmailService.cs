@@ -13,7 +13,7 @@ namespace webApiipAweb.Email
         {
             var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress("Администрация сайта", "ilnaz.gazimov@mail.ru"));
+            emailMessage.From.Add(new MailboxAddress("Администрация сайта", "gamific@oksei.ru"));
             emailMessage.To.Add(new MailboxAddress("", email));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -24,7 +24,7 @@ namespace webApiipAweb.Email
             using (var client = new SmtpClient())
             {
                 await client.ConnectAsync("smtp.mail.ru", 465, true);
-                await client.AuthenticateAsync("ilnaz.gazimov@mail.ru", "SwGRz5YUfbRYaxpEvdGN");
+                await client.AuthenticateAsync("gamific@oksei.ru", "U2xtBK9CtzQ1ANrKZve4");
                 await client.SendAsync(emailMessage);
 
                 await client.DisconnectAsync(true);

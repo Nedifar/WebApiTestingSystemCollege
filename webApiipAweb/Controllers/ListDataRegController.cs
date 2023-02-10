@@ -32,7 +32,7 @@ namespace webApiipAweb.Controllers
         [Route("getAreas")]
         public async Task<ActionResult> GetRegions(string region)
         {
-            var areas = await context.Areas.Where(p=>p.Region.regionName == region).OrderBy(p=>p.areaName).ToListAsync();
+            var areas = await context.Areas.Where(p => p.Region.regionName == region).OrderBy(p => p.areaName).ToListAsync();
             return Ok(areas.Select(p => new
             {
                 Name = p.areaName
@@ -54,11 +54,12 @@ namespace webApiipAweb.Controllers
         [Route("getSchools")]
         public async Task<ActionResult> GetSchool(string municipality)
         {
-            var schools = await context.Schools.Where(p => p.Municipality.name== municipality).OrderBy(p => p.nameSchool).ToListAsync();
+            var schools = await context.Schools.Where(p => p.Municipality.name == municipality).OrderBy(p => p.nameSchool).ToListAsync();
             return Ok(schools.Select(p => new
             {
                 name = p.nameSchool
             }));
+
         }
     }
 }
