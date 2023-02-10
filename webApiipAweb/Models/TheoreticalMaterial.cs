@@ -17,6 +17,8 @@ namespace webApiipAweb.Models
         [ForeignKey("Chapter")]
         public int idChapter { get; set; }
 
+        public string additionalMaterial { get; set; }
+
         [JsonIgnore]
         public virtual Chapter Chapter { get; set; }
 

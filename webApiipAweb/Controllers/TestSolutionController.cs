@@ -15,7 +15,7 @@ namespace webApiipAweb.Controllers
     [ApiController]
     public class TestSolutionController : ControllerBase
     {
-        private Models.context context;
+        private readonly context context;
         public TestSolutionController(Models.context _context)
         {
             context = _context;
@@ -25,54 +25,60 @@ namespace webApiipAweb.Controllers
         [Route("getSubjects")]
         public async Task<ActionResult> GetSubjects(PostTestModels.GetSubjectPost subjectPost)
         {
-            var child = context.Children.Where(p => p.Id == subjectPost.ChildId).FirstOrDefault();
+            var child = await context.Children.FirstOrDefaultAsync(p => p.Id == subjectPost.ChildId);
             if (child == null)
                 return BadRequest("Не найдено.");
-            var exec = child.LevelStudingExecutions.Where(p => p.LevelStuding.nameLevel == child.levelStuding.ToString()).FirstOrDefault();
-            foreach (var mod1 in context.LevelStudings.Where(p => p.nameLevel == child.levelStuding.ToString()).FirstOrDefault().Subjects)
+            var exec = child.LevelStudingExecutions.FirstOrDefault(p => p.LevelStuding.nameLevel == child.levelStuding.ToString());
+            foreach (var mod1 in context.LevelStudings.FirstOrDefault(p => p.nameLevel == child.levelStuding.ToString())?.Subjects)
             {
 
-                if (exec.SubjectExecutions.Where(p => p.idSubject == mod1.idSubject).FirstOrDefault() == null)
+                if (exec.SubjectExecutions.FirstOrDefault(p => p.idSubject == mod1.idSubject) == null)
                 {
-                    exec.SubjectExecutions.Add(new Models.SubjectExecution { Subject = mod1 });
+                    exec.SubjectExecutions.Add(new SubjectExecution { Subject = mod1 });
                 }
 
-                var subexec = exec.SubjectExecutions.Where(p => p.Subject == mod1).FirstOrDefault();
+                var subexec = exec.SubjectExecutions.FirstOrDefault(p => p.Subject == mod1);
                 foreach (var mod2 in mod1.Chapters)
                 {
-                    if (subexec.ChapterExecutions.Where(p => p.idChapter == mod2.idChapter).FirstOrDefault() == null)
+                    if (subexec.ChapterExecutions.FirstOrDefault(p => p.idChapter == mod2.idChapter) == null)
                     {
-                        subexec.ChapterExecutions.Add(new Models.ChapterExecution { Chapter = mod2 });
+                        subexec.ChapterExecutions.Add(new ChapterExecution { Chapter = mod2 });
                     }
-                    var chapexec = subexec.ChapterExecutions.Where(p => p.Chapter == mod2).FirstOrDefault();
+                    var chapexec = subexec.ChapterExecutions.FirstOrDefault(p => p.Chapter == mod2);
                     foreach (var mod4 in mod2.TestPacks)
                     {
-                        if (chapexec.TestPackExecutions.Where(p => p.idTestPack == mod4.idTestPack).FirstOrDefault() == null)
+                        if (chapexec.TestPackExecutions.FirstOrDefault(p => p.idTestPack == mod4.idTestPack) == null)
                         {
-                            chapexec.TestPackExecutions.Add(new Models.TestPackExecution { TestPack = mod4 });
+                            chapexec.TestPackExecutions.Add(new TestPackExecution { TestPack = mod4 });
                         }
-                        var packexec = chapexec.TestPackExecutions.Where(p => p.TestPack == mod4).FirstOrDefault();
+                        var packexec = chapexec.TestPackExecutions.FirstOrDefault(p => p.TestPack == mod4);
                         foreach (var mod3 in mod4.TaskWithOpenAnsws)
                         {
-                            if (packexec.TaskWithOpenAnswsExecutions.Where(p => p.idTask == mod3.idTask).FirstOrDefault() == null) //???
+                            if (packexec.TaskWithOpenAnswsExecutions.FirstOrDefault(p => p.idTask == mod3.idTask) == null) //???
                             {
-                                packexec.TaskWithOpenAnswsExecutions.Add(new Models.TaskWithOpenAnswsExecution { TaskWithOpenAnsw = mod3, Status = StatusTaskExecution.AwaitingExecution });
+                                packexec.TaskWithOpenAnswsExecutions.Add(new TaskWithOpenAnswsExecution { TaskWithOpenAnsw = mod3, Status = StatusTaskExecution.AwaitingExecution });
                             }
-                            var taskexec = packexec.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw == mod3).FirstOrDefault();
+                            var taskexec = packexec.TaskWithOpenAnswsExecutions.FirstOrDefault(p => p.TaskWithOpenAnsw == mod3);
                         }
                         foreach (var mod3 in mod4.TaskWithClosedAnsws)
                         {
-                            if (packexec.TaskWithClosedAnswsExecutions.Where(p => p.idTask == mod3.idTask).FirstOrDefault() == null) //???
+                            if (packexec.TaskWithClosedAnswsExecutions.FirstOrDefault(p => p.idTask == mod3.idTask) == null) //???
                             {
                                 packexec.TaskWithClosedAnswsExecutions.Add(new Models.TaskWithClosedAnswsExecution { TaskWithClosedAnsw = mod3, Status = StatusTaskExecution.AwaitingExecution });
                             }
-                            var taskexec = packexec.TaskWithClosedAnswsExecutions.Where(p => p.TaskWithClosedAnsw == mod3).FirstOrDefault();
+                            var taskexec = packexec.TaskWithClosedAnswsExecutions.FirstOrDefault(p => p.TaskWithClosedAnsw == mod3);
                         }
                     }
                 }
             }
             await context.SaveChangesAsync();
-            return Ok(exec.SubjectExecutions.Select(p => new { idExec = p.idSubjectExecution, NameSub = p.Subject.nameSubject, ProgressInProcent = p.getProgressInProcent }));
+            return Ok(exec.SubjectExecutions.Select(p => new
+            {
+                idExec = p.idSubjectExecution,
+                NameSub = p.Subject.nameSubject,
+                ProgressInProcent = p.getProgressInProcent
+            }
+            ));
         }
 
         [HttpPost]
@@ -80,7 +86,19 @@ namespace webApiipAweb.Controllers
         public async Task<ActionResult> GetChapters(PostTestModels.GetChaptersPost chaptersPost)
         {
             var s = await context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution).ToListAsync();
-            return Ok(s.Select(p => new { NameChapter = p.Chapter.name, Description = p.Chapter.Description, getProcentChapterDecide = p.getProcentMainTasks, MainPackProcent = p.getProcentMainTasks, OtherPackProcent = p.getProcentOtherTasks, idExec = p.idChapterExecution, access = p.Chapter.access }));
+            return Ok(s.OrderBy(p => p.Chapter.numeric)
+                .ThenBy(p => p.idChapter)
+                .Select(p => new
+                {
+                    NameChapter = p.Chapter.name,
+                    p.Chapter.Description,
+                    getProcentChapterDecide = p.getProcentMainTasks,
+                    MainPackProcent = p.getProcentMainTasks,
+                    OtherPackProcent = p.getProcentOtherTasks,
+                    idExec = p.idChapterExecution,
+                    p.Chapter.access
+                }
+                ));
         }
 
         [HttpPost]
@@ -116,15 +134,16 @@ namespace webApiipAweb.Controllers
                 }),
                 theory = s.Chapter.TheoreticalMaterials.Select(l => new
                 {
-                    header = l.header,
-                    content = l.content,
+                    l.header,
+                    l.content,
+                    additionalMaterial = l.additionalMaterial,
                     resources = l.TheoreticalMaterialResources.Select(s => new
                     {
                         header = s.header,
                         url = "https://gamification.oksei.ru/imagecontainer/" + s.url
                     })
                 }),
-                access = s.Chapter.access,
+                s.Chapter.access,
             });
         }
 
@@ -134,14 +153,15 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                var s = await context.TestPackExecutions.Where(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack).FirstOrDefaultAsync();
-                var closed = s.TaskWithClosedAnswsExecutions.Where(p => p.TaskWithClosedAnsw.numericInPack == model.serialNumber).FirstOrDefault();
-                var opened = s.TaskWithOpenAnswsExecutions.Where(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber).FirstOrDefault();
+                var s = await context.TestPackExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack);
+                var closed = s.TaskWithClosedAnswsExecutions.FirstOrDefault(p => p.TaskWithClosedAnsw.numericInPack == model.serialNumber);
+                var opened = s.TaskWithOpenAnswsExecutions.FirstOrDefault(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber);
                 int? id = opened?.idTask ?? closed?.idTask;
-                string imageUrl = String.Empty;
-                imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
+                string imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
                 var timeNow = DateTime.UtcNow.AddHours(5);
-                var currentTime = (new DateTime(timeNow.Year, timeNow.Month, timeNow.Day+1, 0, 0, 0) - timeNow).Hours + "ч " + (new DateTime(timeNow.Year, timeNow.Month, timeNow.Day + 1, 0, 0, 0) - timeNow).Minutes + "мин";
+                var currentTime = (new DateTime(timeNow.Year, timeNow.Month, timeNow.Day + 1, 0, 0, 0) - timeNow).Hours
+                    + "ч "
+                    + (new DateTime(timeNow.Year, timeNow.Month, timeNow.Day + 1, 0, 0, 0) - timeNow).Minutes + "мин";
                 if ((new DateTime(timeNow.Year, timeNow.Month, timeNow.Day + 1, 0, 0, 0) - timeNow).Hours == 0)
                     currentTime = currentTime.Replace("0ч ", "");
                 if (closed is not null)
@@ -156,7 +176,7 @@ namespace webApiipAweb.Controllers
                             text = p.textAnswear,
                             idAnswear = p.idAnswearOnTask
                         }),
-                        locked = closed.lockedTime > DateTime.UtcNow.AddHours(5) ? true : false,
+                        locked = closed.lockedTime > DateTime.UtcNow.AddHours(5),
                         lockedTime = currentTime,
                         status = closed.GetStatus(),
                         type = closed.TaskWithClosedAnsw.TypesTask.ToString(),
@@ -181,7 +201,7 @@ namespace webApiipAweb.Controllers
                         {
                             url = "http://192.168.147.72:83/" + $"{p.url.Replace("images/", "")}"
                         }),
-                        locked = opened.lockedTime > DateTime.UtcNow.AddHours(5) ? true : false,
+                        locked = opened.lockedTime > DateTime.UtcNow.AddHours(5),
                         lockedTime = currentTime,
                         typeResult = opened.TaskWithOpenAnsw.GetResultType(),
                         modelResult = opened.TaskWithOpenAnsw.htmlModel
@@ -202,15 +222,14 @@ namespace webApiipAweb.Controllers
         [Route("ReplyTaskOpenOnNumber")]
         public async Task<ActionResult> ReplyTaskOpenOnNumber(PostModels.ReplyTaskOpenOnNumberPost model)
         {
-            var s = context.TaskWithOpenAnswsExecutions
-                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
+            var s = await context.TaskWithOpenAnswsExecutions
+                .FirstOrDefaultAsync(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
                 && p.TestPackExecution.TestPack.header == model.testPackHeader
-                && p.TaskWithOpenAnsw.numericInPack == model.serialNumber)
-                .FirstOrDefault();
+                && p.TaskWithOpenAnsw.numericInPack == model.serialNumber);
             s.AnswearResult = model.answear;
 
             double mark = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Sum(p => p.mark);
-            int count = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Count();
+            int count = s.TaskWithOpenAnsw.AnswearOnTaskOpens.Count;
 
             string ans = model.answear;
 
@@ -324,14 +343,12 @@ namespace webApiipAweb.Controllers
         [Route("ReplyTaskClosedOnNumber")]
         public async Task<ActionResult> ReplyTaskClosedOnNumber(PostModels.ReplyTaskClosedOnNumberPost model)
         {
-            ///Добавь сюда сохарнеие результата без зависимости от правильности
-            var s = context.TaskWithClosedAnswsExecutions
-                .Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
+            var s = await context.TaskWithClosedAnswsExecutions
+                .FirstOrDefaultAsync(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
                 && p.TestPackExecution.TestPack.header == model.testPackHeader
-                && p.TaskWithClosedAnsw.numericInPack == model.serialNumber)
-                .FirstOrDefault();
-            s.AnswearOnTask = context.AnswearOnTasks.Where(p => p.idAnswearOnTask == model.idAnswear).FirstOrDefault();
-            if (s.TaskWithClosedAnsw.AnswearOnTask.Where(p => p.accuracy).FirstOrDefault().idAnswearOnTask == model.idAnswear)
+                && p.TaskWithClosedAnsw.numericInPack == model.serialNumber);
+            s.AnswearOnTask = await context.AnswearOnTasks.FirstOrDefaultAsync(p => p.idAnswearOnTask == model.idAnswear);
+            if (s.TaskWithClosedAnsw.AnswearOnTask.FirstOrDefault(p => p.accuracy)?.idAnswearOnTask == model.idAnswear)
             {
                 s.Status = StatusTaskExecution.Correct;
                 await context.SaveChangesAsync();
@@ -380,7 +397,11 @@ namespace webApiipAweb.Controllers
         {
             if (model.mode == null)
             {
-                var mod = context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault();
+                var mod = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                && p.TestPackExecution.TestPack.header == model.testPackHeader)
+                    .OrderByDescending(p => p.idTryingTestTask)
+                    .FirstOrDefaultAsync();
+
                 if (mod != null && mod.status == "Начат")
                 {
                     return Ok("Есть незаконченный тест, хотите продолжить его? Или начнете заново?");
@@ -392,7 +413,9 @@ namespace webApiipAweb.Controllers
             }
             else if (model.mode == "continue")
             {
-                return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter).OrderByDescending(p => p.idTryingTestTask).Select(p => new
+                return Ok(await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter)
+                    .OrderByDescending(p => p.idTryingTestTask)
+                    .Select(p => new
                 {
                     TestTaskExecutions = p.TestTaskExecutions.Select(s => new
                     {
@@ -413,11 +436,14 @@ namespace webApiipAweb.Controllers
                             })
                         }
                     })
-                }).FirstOrDefault());
+                }).FirstOrDefaultAsync());
             }
             else if (model.mode == "new")
             {
-                var m = context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault();
+                var m = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                && p.TestPackExecution.TestPack.header == model.testPackHeader)
+                    .OrderByDescending(p => p.idTryingTestTask)
+                    .FirstOrDefaultAsync();
                 m.status = "Завершен";
                 m.result = m.TestTaskExecutions.Count(p =>
                 {
@@ -441,7 +467,10 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                var m = context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter && p.TestPackExecution.TestPack.header == model.testPackHeader).OrderByDescending(p => p.idTryingTestTask).FirstOrDefault();
+                var m = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                && p.TestPackExecution.TestPack.header == model.testPackHeader)
+                    .OrderByDescending(p => p.idTryingTestTask)
+                    .FirstOrDefaultAsync();
                 m.status = "Завершен";
                 m.result = m.TestTaskExecutions.Count(p =>
                 {
@@ -463,8 +492,8 @@ namespace webApiipAweb.Controllers
         [Route("replytesttask")]
         public async Task<ActionResult> ReplyTestTask(ReplyTestTask model)
         {
-            var testtask = context.TestTaskExecutions.Where(p => p.idTestTaskExecution == model.idTestTaskExecution).FirstOrDefault();
-            testtask.AnswearOnTask = context.AnswearOnTasks.Where(p => p.idAnswearOnTask == model.idAnswearOnTask).FirstOrDefault();
+            var testtask = await context.TestTaskExecutions.FirstOrDefaultAsync(p => p.idTestTaskExecution == model.idTestTaskExecution);
+            testtask.AnswearOnTask = context.AnswearOnTasks.FirstOrDefault(p => p.idAnswearOnTask == model.idAnswearOnTask);
             if (testtask.AnswearOnTask.accuracy)
             {
                 testtask.StatusExecution = StatusExecution.Correct;
@@ -482,10 +511,10 @@ namespace webApiipAweb.Controllers
 
         private async Task<ActionResult> BeginTestSecond(PostTestModels.BeginTestModel model)
         {
-            var s = new Models.TryingTestTask { };
-            var ms = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idExecChapter).FirstOrDefault();
+            var s = new TryingTestTask { };
+            var ms = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == model.idExecChapter);
             s.status = "Начат";
-            s.TestPackExecution = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idExecChapter).FirstOrDefault().TestPackExecutions.FirstOrDefault();
+            s.TestPackExecution = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == model.idExecChapter)?.TestPackExecutions.FirstOrDefault();
             foreach (var vvv in s.TestPackExecution.TestPack.TestTasks)
             {
                 s.TestTaskExecutions.Add(new Models.TestTaskExecution { TestTask = vvv });

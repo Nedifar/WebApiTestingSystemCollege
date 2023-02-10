@@ -113,6 +113,7 @@ namespace webApiipAweb.Controllers
                             name = chapter.Chapter.name,
                             sessions = chapter.SessionChapterExecutions.Select(session => new
                             {
+                                idSes = session.idSessionChapterExecution,
                                 beginDateTime = session.beginDateTime,
                                 endDateTime = session.endDateTime,
                                 timeExecution = ((session.endDateTime??DateTime.UtcNow.AddHours(5)) - session.beginDateTime).Value,

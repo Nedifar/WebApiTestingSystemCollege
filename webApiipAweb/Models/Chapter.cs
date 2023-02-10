@@ -19,6 +19,8 @@ namespace webApiipAweb.Models
 
         public bool access { get; set; }
 
+        public int numeric { get; set; }
+
         [ForeignKey("Subject")]
         public int idSubject { get; set; }
 
