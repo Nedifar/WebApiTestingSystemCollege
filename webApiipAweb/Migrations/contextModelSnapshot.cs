@@ -344,6 +344,9 @@ namespace webApiipAweb.Migrations
                     b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("numeric")
+                        .HasColumnType("int");
+
                     b.HasKey("idChapter");
 
                     b.HasIndex("idSubject");
