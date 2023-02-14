@@ -118,54 +118,99 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpGet]
-        [Route("getSessionOfChildren")]
-        public async ActionResult GetSessionOfChildes([FromBody] string idChild)
+        [Route("getSessionOfChild")]
+        public async Task<ActionResult> GetSessionOfChild([FromQuery] string idChild, [FromQuery] int idChapter)
         {
             await BeforeSessionResponse();
             var child = await context.Children.FirstOrDefaultAsync(p => p.Id == idChild);
+            var currentChapterSessions = child?.SessionChapterExecutions.Where(p => p.ChapterExecution.idChapter == idChapter);
+            var currentChapterExecution = currentChapterSessions?.FirstOrDefault()?.ChapterExecution;
             return child == null
                 ? NotFound()
                 : Ok(new
                 {
-                    fullName = child.lastName + " " + child.firstName,
-                    
+                    name = child.lastName + " " + child.firstName,
+                    theorySessions = currentChapterExecution.TheorySessions.Select(session => new
+                    {
+                        beginDateTime = session.beginDate,
+                        endDateTime = session.endDate,
+                        timeExecution = ((session.endDate ?? DateTime.UtcNow.AddHours(5)) - session.beginDate).Value,
+                        status = session.active ? "Активна" : "Завершена",
+                        nameChapter = session.ChapterExecution.Chapter.name,
+                    }),
+                    sessions = currentChapterSessions.OrderBy(p => p.idSessionChapterExecution).Select(session => new
+                    {
+                        beginDateTime = session.beginDateTime,
+                        endDateTime = session.endDateTime,
+                        timeExecution = ((session.endDateTime ?? DateTime.UtcNow.AddHours(5)) - session.beginDateTime).Value,
+                        status = session.activeSession ? "Активна" : "Завершена",
+                        nameChapter = session.ChapterExecution.Chapter.name,
+
+                        SessionProgresses = session.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
+                        {
+                            taskNumber = sessionProgress.taskNumber,
+                            status = sessionProgress.GetStatus()
+                        }),
+                    }),
+                    FinishResults = currentChapterSessions.OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault()
+                            ?.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
+                            {
+                                taskNumber = sessionProgress.taskNumber,
+                                status = sessionProgress.GetStatus() == "Ожидает выполнения" ? "Решено неверно" : sessionProgress.GetStatus()
+                            })
                 });
         }
 
         [HttpGet]
-        [Route("getChildrenOfSubjects")]
-        public async ActionResult GetChildrenOfSchool([FromBody] int idSchool, [FromBody] int studingLevel)
+        [Route("getChildrenOfChapter")]
+        public async Task<ActionResult> getChildrenOfChapter([FromQuery] int idChapter, [FromQuery] int idSchool)
         {
-            
+            var children = await context.Children.Where(p => p.idSchool == idSchool
+            && p.LevelStudingExecutions.FirstOrDefault(level => level.SubjectExecutions.FirstOrDefault(p => p.ChapterExecutions.FirstOrDefault(p => p.idChapter == idChapter) is ChapterExecution) is SubjectExecution) is LevelStudingExecution)
+                .ToListAsync();
+            return children.Count == 0
+                ? NotFound("Ученики не найдены")
+                : Ok(children.Select(p => new
+                {
+                    idChild = p.Id,
+                    name = p.lastName + " " + p.firstName,
+                }));
         }
 
         [HttpGet]
         [Route("getSubjectsOfLevelSchool")]
-        public async ActionResult GetChildrenOfSchool([FromBody] int studingLevel)
-        {
-            var subjects = await context.Subjects.Where(p=>p.idLevelStuding == studingLevel).ToListAsync();
+        public async Task<ActionResult> GetChildrenOfSchool(string studingLevel)
+        {   
+            var subjects = await context.Subjects.Where(p => p.LevelStuding.nameLevel == studingLevel).ToListAsync();
             return subjects.Count == 0
-                ? NotFound()
-                : Ok(); ///ты остановился здесь
+                ? NotFound("Предметы не найдены.")
+                : Ok(subjects.Select(p => new
+                {
+                    idSubject = p.idSubject,
+                    name = p.nameSubject
+                }));
         }
 
+        [HttpGet]
+        [Route("getChaptersOfSubjects")]
+        public async Task<ActionResult> getChaptersOfSubject([FromQuery] int idSubject)
+        {
+            var chapters = await context.Chapters.Where(p => p.idSubject == idSubject).ToListAsync();
+            return chapters.Count == 0
+                ? NotFound("Предметы не найдены.")
+                : Ok(chapters.OrderBy(p=>p.numeric).Select(p => new
+                {
+                    idChapter = p.idChapter,
+                    name = p.name
+                }));
+        }
 
         [HttpGet]
         [Route("getsessionstheory")]
         public async Task<ActionResult> GetAllSessionsToTheory()
         {
-            var childs = context.Children.ToList();
-            var sessions = await context.TheorySessions.ToListAsync();
-            foreach (var session in sessions.Where(p => p.active))
-            {
-                if (session.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && session.active)
-                {
-                    session.active = false;
-                    session.endDate = session.beginDate.Value.AddHours(1);
-                }
-            }
-            context.SaveChanges();
-            return Ok(childs.Select(child => new
+            var children = context.Children.ToList();
+            return Ok(children.Select(child => new
             {
                 child = child.lastName + " " + child.firstName,
                 level = child.LevelStudingExecutions.Select(level => new
@@ -327,7 +372,6 @@ namespace webApiipAweb.Controllers
 
         private async Task BeforeSessionResponse()
         {
-            var children = context.Children.ToList();
             var sessions = await context.SessionChapterExecutions.ToListAsync();
             foreach (var session in sessions.Where(p => p.activeSession))
             {
@@ -349,6 +393,17 @@ namespace webApiipAweb.Controllers
                     }
                 }
             }
+
+            var theorySessions = await context.TheorySessions.ToListAsync();
+            foreach (var session in theorySessions.Where(p => p.active))
+            {
+                if (session.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && session.active)
+                {
+                    session.active = false;
+                    session.endDate = session.beginDate.Value.AddHours(1);
+                }
+            }
+
             context.SaveChanges();
         }
     }

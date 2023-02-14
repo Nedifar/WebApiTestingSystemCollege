@@ -57,6 +57,7 @@ namespace webApiipAweb.Controllers
             var schools = await context.Schools.Where(p => p.Municipality.name == municipality).OrderBy(p => p.nameSchool).ToListAsync();
             return Ok(schools.Select(p => new
             {
+                idSchool = p.idSchool,
                 name = p.nameSchool
             }));
 
