@@ -850,3 +850,10 @@ C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\Microsoft.As
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\Microsoft.Extensions.FileProviders.Embedded.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\webApiipAweb.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\staticwebassets\webApiipAweb.StaticWebAssets.xml
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\ClosedXML.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\DocumentFormat.OpenXml.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\ExcelNumberFormat.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\Irony.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\SixLabors.Fonts.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\System.IO.Packaging.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\XLParser.dll
