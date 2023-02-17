@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using webApiipAweb.Models;
@@ -61,6 +62,32 @@ namespace webApiipAweb.Controllers
                 name = p.nameSchool
             }));
 
+        }
+
+        [HttpGet]
+        [Route("getLevelsStuding")]
+        public async Task<ActionResult> GetLevelsStuding()
+        {
+            var levels = await context.LevelStudings.OrderBy(p=>Convert.ToInt32(p.nameLevel)).ToListAsync();
+            return Ok(levels.Select(p => new
+            {
+                level = p.nameLevel,
+                subjs = p.Subjects.Select(p => new
+                {
+                    idSubj = p.idSubject,
+                    nameSubject = p.nameSubject,
+                    chapters = p.Chapters.Select(p => new
+                    {
+                        idChapter = p.idChapter,
+                        chapterName = p.name,
+                        testPacks = p.TestPacks.Select(p => new
+                        {
+                            idTestPack = p.idTestPack,
+                            name = p.header
+                        })
+                    })
+                })
+            }));
         }
     }
 }

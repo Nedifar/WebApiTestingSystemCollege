@@ -10,7 +10,7 @@ namespace webApiipAweb.Models
     public class SubjectExecution
     {
         [Key]
-        public int idSubjectExecution { get; set; }
+        public string idSubjectExecution { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("Subject")]
         public int? idSubject { get; set; }
@@ -18,7 +18,7 @@ namespace webApiipAweb.Models
         public virtual Subject Subject { get; set; }
 
         [ForeignKey("LevelStudingExecution")]
-        public int idLevelStudingExecution { get; set; }
+        public string idLevelStudingExecution { get; set; }
 
         public virtual LevelStudingExecution LevelStudingExecution { get; set; }
 
@@ -28,7 +28,7 @@ namespace webApiipAweb.Models
         {
             get
             {
-                return ChapterExecutions.Average(p => p.getProcentChapter) + "%";
+                return (int)ChapterExecutions.Average(p => p.getProcentChapter) + "%";
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -8,7 +9,7 @@ namespace webApiipAweb.Models
     public class ParentTask
     {
         [Key]
-        public int idTask { get; set; }
+        public string idTask { get; set; } = Guid.NewGuid().ToString();
 
         public string textQuestion { get; set; }
 
@@ -19,7 +20,7 @@ namespace webApiipAweb.Models
         public TypesTask TypesTask { get; set; }
 
         [ForeignKey("TestPack")]
-        public int? idTestPack { get; set; }
+        public string idTestPack { get; set; }
 
         [JsonIgnore]
         public virtual TestPack TestPack { get; set; }

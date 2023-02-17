@@ -11,16 +11,17 @@ namespace webApiipAweb.Models
     public class TheoreticalMaterial
     {
         [Key]
-        public int idTheoreticalMaterial { get; set; }
+        public string idTheoreticalMaterial { get; set; } = Guid.NewGuid().ToString();
+
         public string header { get; set; }
+
         public string content { get; set; }
+
         [ForeignKey("Chapter")]
-        public int idChapter { get; set; }
+        public string idChapter { get; set; }
+        public virtual Chapter Chapter { get; set; }
 
         public string additionalMaterial { get; set; }
-
-        [JsonIgnore]
-        public virtual Chapter Chapter { get; set; }
 
         public virtual List<TheoreticalMaterialResource> TheoreticalMaterialResources { get; set; } = new List<TheoreticalMaterialResource>();
     }

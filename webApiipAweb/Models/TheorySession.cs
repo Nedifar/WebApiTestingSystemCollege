@@ -7,7 +7,7 @@ namespace webApiipAweb.Models
     public class TheorySession
     {
         [Key]
-        public int idTheorySession { get; set; }
+        public string idTheorySession { get; set; } = Guid.NewGuid().ToString();
 
         public DateTime? beginDate { get; set; }
 
@@ -21,7 +21,7 @@ namespace webApiipAweb.Models
         public virtual Child Child { get; set; }
 
         [ForeignKey("ChapterExecution")]
-        public int idChapterExecution { get; set; }
+        public string idChapterExecution { get; set; }
 
         public virtual ChapterExecution ChapterExecution { get; set; }
     }

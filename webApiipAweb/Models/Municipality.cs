@@ -12,7 +12,7 @@ namespace webApiipAweb.Models
         public string name { get; set; }
 
         [ForeignKey("Area")]
-        public int idArea { get; set; }
+        public string idArea { get; set; }
 
         public virtual Area Area { get; set; }
 

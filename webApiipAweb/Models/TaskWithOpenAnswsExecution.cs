@@ -11,10 +11,10 @@ namespace webApiipAweb.Models
     public class TaskExecutionParent
     {
         [Key]
-        public int idTaskExecution { get; set; }
+        public string idTaskExecution { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("TestPackExecution")]
-        public int? idTestPackExecution { get; set; }
+        public string idTestPackExecution { get; set; }
 
         [JsonIgnore]
         public virtual TestPackExecution TestPackExecution { get; set; }
@@ -48,7 +48,7 @@ namespace webApiipAweb.Models
         public string AnswearResult { get; set; }
 
         [ForeignKey("TaskWithOpenAnsw")]
-        public int? idTask { get; set; }
+        public string idTask { get; set; }
 
         public virtual TaskWithOpenAnsw TaskWithOpenAnsw { get; set; }
     }
@@ -56,12 +56,12 @@ namespace webApiipAweb.Models
     public class TaskWithClosedAnswsExecution : TaskExecutionParent
     {
         [ForeignKey("AnswearOnTask")]
-        public int? idAnswearOnTask { get; set; }
+        public string idAnswearOnTask { get; set; }
 
         public virtual AnswearOnTask AnswearOnTask { get; set; }
 
         [ForeignKey("TaskWithClosedAnsw")]
-        public int? idTask { get; set; }
+        public string idTask { get; set; }
 
         public virtual TaskWithClosedAnsw TaskWithClosedAnsw { get; set; }
     }

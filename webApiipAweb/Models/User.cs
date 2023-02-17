@@ -48,7 +48,7 @@ namespace webApiipAweb.Models
         public virtual List<TheorySession> TheorySessions { get; set; } = new List<TheorySession>();
 
         [ForeignKey("School")]
-        public int? idSchool { get; set; }
+        public string idSchool { get; set; }
 
         public virtual School School { get; set; }
 

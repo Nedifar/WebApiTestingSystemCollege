@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,7 +8,7 @@ namespace webApiipAweb.Models
     public class Area
     {
         [Key]
-        public int idArea { get; set; }
+        public string idArea { get; set; } = Guid.NewGuid().ToString();
 
         public string areaName { get; set; }
 

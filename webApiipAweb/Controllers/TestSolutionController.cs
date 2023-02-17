@@ -8,6 +8,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using webApiipAweb.Models;
+using System.Web;
+using System.Security.Policy;
 
 namespace webApiipAweb.Controllers
 {
@@ -85,9 +87,9 @@ namespace webApiipAweb.Controllers
         [Route("getChapters")]
         public async Task<ActionResult> GetChapters(PostTestModels.GetChaptersPost chaptersPost)
         {
-            var s = await context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution).ToListAsync();
+            var s = await context.ChapterExecutions.Where(p => p.idSubjectExecution == chaptersPost.idSubjectExecution && p.Chapter.isVisible).ToListAsync();
             return Ok(s.OrderBy(p => p.Chapter.numeric)
-                .ThenBy(p => p.idChapter)
+                .ThenBy(p => p.Chapter.name)
                 .Select(p => new
                 {
                     NameChapter = p.Chapter.name,
@@ -153,11 +155,13 @@ namespace webApiipAweb.Controllers
         {
             try
             {
+                var address = Response.HttpContext.Connection.RemoteIpAddress.ToString() == "192.168.102.108"
+                    ? "https://gamification.oksei.ru/imagecontainer/"
+                    : "http://192.168.147.72:81/imagecontainer/";
                 var s = await context.TestPackExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack);
                 var closed = s.TaskWithClosedAnswsExecutions.FirstOrDefault(p => p.TaskWithClosedAnsw.numericInPack == model.serialNumber);
                 var opened = s.TaskWithOpenAnswsExecutions.FirstOrDefault(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber);
-                int? id = opened?.idTask ?? closed?.idTask;
-                string imageUrl = "http://192.168.147.72:83/" + $"task{id}.jpeg";
+                string id = opened?.idTask ?? closed?.idTask;
                 var timeNow = DateTime.UtcNow.AddHours(5);
                 var currentTime = (new DateTime(timeNow.Year, timeNow.Month, timeNow.Day + 1, 0, 0, 0) - timeNow).Hours
                     + "ч "
@@ -181,30 +185,42 @@ namespace webApiipAweb.Controllers
                         status = closed.GetStatus(),
                         type = closed.TaskWithClosedAnsw.TypesTask.ToString(),
                         theme = closed.TaskWithClosedAnsw.theme,
-                        solutions = closed.TaskWithClosedAnsw.Solutions.Select(p => new
+                        solutions = closed.TaskWithClosedAnsw.Solutions?.Select(p => new
                         {
-                            url = "http://192.168.147.72:83/" + $"{p.url.Replace("images/", "")}"
+                            url = address + $"{p.url.Replace("images/", "")}"
                         })
                     });
                 }
                 else if (opened is not null)
                 {
+                    string textQ = String.Empty;
+                    if (opened.TaskWithOpenAnsw.textQuestion.Contains("images"))
+                    {
+                        textQ = address + $"{opened.TaskWithOpenAnsw.textQuestion.Replace("images/", "")}";
+                    }
+                    else
+                    {
+                        textQ = opened.TaskWithOpenAnsw.textQuestion;
+                    }
+
                     return Ok(new
                     {
-                        textQuestion = imageUrl,
+                        textQuestion = textQ,
                         serialNumber = model.serialNumber,
                         selectedAnswear = opened.AnswearResult,
                         status = opened.GetStatus(),
                         type = opened.TaskWithOpenAnsw.TypesTask.ToString(),
                         theme = opened.TaskWithOpenAnsw.theme,
-                        solutions = opened.TaskWithOpenAnsw.Solutions.Select(p => new
+                        solutions = opened.TaskWithOpenAnsw.Solutions?.Select(p => new
                         {
-                            url = "http://192.168.147.72:83/" + $"{p.url.Replace("images/", "")}"
+                            url = p.url.Contains("images")
+                            ? address + $"{p.url.Replace("images/", "")}"
+                            : p.url
                         }),
                         locked = opened.lockedTime > DateTime.UtcNow.AddHours(5),
                         lockedTime = currentTime,
                         typeResult = opened.TaskWithOpenAnsw.GetResultType(),
-                        modelResult = opened.TaskWithOpenAnsw.htmlModel
+                        modelResult = opened.TaskWithOpenAnsw.htmlModel,
                     });
                 }
                 else
@@ -214,8 +230,9 @@ namespace webApiipAweb.Controllers
             }
             catch
             {
-                return BadRequest("Неверный серийный номер.");
+                return BadRequest("Неверный серийный номер");
             }
+
         }
 
         [HttpPost]
@@ -397,9 +414,9 @@ namespace webApiipAweb.Controllers
         {
             if (model.mode == null)
             {
-                var mod = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                var mod = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
                 && p.TestPackExecution.TestPack.header == model.testPackHeader)
-                    .OrderByDescending(p => p.idTryingTestTask)
+                    .OrderByDescending(p => p.startDate)
                     .FirstOrDefaultAsync();
 
                 if (mod != null && mod.status == "Начат")
@@ -414,35 +431,35 @@ namespace webApiipAweb.Controllers
             else if (model.mode == "continue")
             {
                 return Ok(await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter)
-                    .OrderByDescending(p => p.idTryingTestTask)
+                    .OrderByDescending(p => p.startDate)
                     .Select(p => new
-                {
-                    TestTaskExecutions = p.TestTaskExecutions.Select(s => new
                     {
-                        idTestTaskExecution = s.idTestTaskExecution,
-                        answearOnTask = s.AnswearOnTask == null ? null : new
+                        TestTaskExecutions = p.TestTaskExecutions.Select(s => new
                         {
-                            idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
-                            text = s.AnswearOnTask.textAnswear,
-                            status = s.GetStatus()
-                        },
-                        TestPack = new
-                        {
-                            s.TestTask.textQuestion,
-                            AnswearOnTasks = s.TestTask.AnswearOnTasks.Select(m => new
+                            idTestTaskExecution = s.idTestTaskExecution,
+                            answearOnTask = s.AnswearOnTask == null ? null : new
                             {
-                                m.idAnswearOnTask,
-                                m.textAnswear
-                            })
-                        }
-                    })
-                }).FirstOrDefaultAsync());
+                                idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
+                                text = s.AnswearOnTask.textAnswear,
+                                status = s.GetStatus()
+                            },
+                            TestPack = new
+                            {
+                                s.TestTask.textQuestion,
+                                AnswearOnTasks = s.TestTask.AnswearOnTasks.Select(m => new
+                                {
+                                    m.idAnswearOnTask,
+                                    m.textAnswear
+                                })
+                            }
+                        })
+                    }).FirstOrDefaultAsync());
             }
             else if (model.mode == "new")
             {
-                var m = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                var m = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
                 && p.TestPackExecution.TestPack.header == model.testPackHeader)
-                    .OrderByDescending(p => p.idTryingTestTask)
+                    .OrderByDescending(p => p.startDate)
                     .FirstOrDefaultAsync();
                 m.status = "Завершен";
                 m.result = m.TestTaskExecutions.Count(p =>
@@ -467,9 +484,9 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                var m = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter 
+                var m = await context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter
                 && p.TestPackExecution.TestPack.header == model.testPackHeader)
-                    .OrderByDescending(p => p.idTryingTestTask)
+                    .OrderByDescending(p => p.startDate)
                     .FirstOrDefaultAsync();
                 m.status = "Завершен";
                 m.result = m.TestTaskExecutions.Count(p =>
@@ -521,34 +538,36 @@ namespace webApiipAweb.Controllers
             }
             context.TryingTestTasks.Add(s);
             await context.SaveChangesAsync();
-            return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter).OrderByDescending(p => p.idTryingTestTask).Select(p => new
-            {
-                TestTaskExecutions = p.TestTaskExecutions.Select(s => new
+            return Ok(context.TryingTestTasks.Where(p => p.TestPackExecution.idChapterExecution == model.idExecChapter)
+                .OrderByDescending(p => p.startDate)
+                .Select(p => new
                 {
-                    idTestTaskExecution = s.idTestTaskExecution,
-                    status = s.GetStatus(),
-                    answearOnTask = s.AnswearOnTask == null ? null : new
+                    TestTaskExecutions = p.TestTaskExecutions.Select(s => new
                     {
-                        idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
-                        text = s.AnswearOnTask.textAnswear
-                    },
-                    TestPack = new
-                    {
-                        s.TestTask.textQuestion,
-                        AnswearOnTasks = s.TestTask.AnswearOnTasks.Select(m => new
+                        idTestTaskExecution = s.idTestTaskExecution,
+                        status = s.GetStatus(),
+                        answearOnTask = s.AnswearOnTask == null ? null : new
                         {
-                            m.idAnswearOnTask,
-                            m.textAnswear
-                        })
-                    }
-                })
-            }).FirstOrDefault());
+                            idAnswearOnTask = s.AnswearOnTask.idAnswearOnTask,
+                            text = s.AnswearOnTask.textAnswear
+                        },
+                        TestPack = new
+                        {
+                            s.TestTask.textQuestion,
+                            AnswearOnTasks = s.TestTask.AnswearOnTasks.Select(m => new
+                            {
+                                m.idAnswearOnTask,
+                                m.textAnswear
+                            })
+                        }
+                    })
+                }).FirstOrDefault());
         }
     }
 
     public class ReplyTestTask
     {
-        public int idTestTaskExecution { get; set; }
-        public int idAnswearOnTask { get; set; }
+        public string idTestTaskExecution { get; set; }
+        public string idAnswearOnTask { get; set; }
     }
 }

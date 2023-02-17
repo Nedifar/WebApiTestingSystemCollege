@@ -7,7 +7,7 @@ namespace webApiipAweb.PostTestModels
 {
     public class BeginTestModel
     {
-        public int idExecChapter { get; set; }
+        public string idExecChapter { get; set; }
         public string mode { get; set; }
         public string testPackHeader { get; set; }
     }

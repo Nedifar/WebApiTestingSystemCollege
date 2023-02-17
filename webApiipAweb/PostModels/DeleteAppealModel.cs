@@ -7,7 +7,7 @@ namespace webApiipAweb.PostModels
 {
     public class DeleteAppealModel
     {
-        public int idAppeal { get; set; }
+        public string idAppeal { get; set; }
         public string ChildId { get; set; }
     }
 }

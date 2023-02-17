@@ -140,10 +140,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.Achivment", b =>
                 {
-                    b.Property<int>("idAchivment")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idAchivment")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -158,16 +156,14 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.AchivmentExecution", b =>
                 {
-                    b.Property<int>("idAchivmentExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idAchivmentExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ChildId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idAchivment")
-                        .HasColumnType("int");
+                    b.Property<string>("idAchivment")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("idAchivmentExecution");
 
@@ -180,19 +176,17 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.AnswearOnTask", b =>
                 {
-                    b.Property<int>("idAnswearOnTask")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idAnswearOnTask")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("accuracy")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("idTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("idTestTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestTask")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("textAnswear")
                         .HasColumnType("nvarchar(max)");
@@ -208,16 +202,14 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.AnswearOnTaskOpen", b =>
                 {
-                    b.Property<int>("idAnswearOnTaskOpen")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idAnswearOnTaskOpen")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("answear")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("idTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTask")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("mark")
                         .HasColumnType("float");
@@ -231,10 +223,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.Appeal", b =>
                 {
-                    b.Property<int>("idAppeal")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idAppeal")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ChildId")
                         .HasColumnType("nvarchar(450)");
@@ -307,10 +297,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.Area", b =>
                 {
-                    b.Property<int>("idArea")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idArea")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("areaName")
                         .HasColumnType("nvarchar(max)");
@@ -327,10 +315,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.Chapter", b =>
                 {
-                    b.Property<int>("idChapter")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idChapter")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -340,6 +326,9 @@ namespace webApiipAweb.Migrations
 
                     b.Property<int>("idSubject")
                         .HasColumnType("int");
+
+                    b.Property<bool>("isVisible")
+                        .HasColumnType("bit");
 
                     b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
@@ -356,16 +345,14 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.ChapterExecution", b =>
                 {
-                    b.Property<int>("idChapterExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idChapterExecution")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idChapter")
-                        .HasColumnType("int");
+                    b.Property<string>("idChapter")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("idSubjectExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idSubjectExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("idChapterExecution");
 
@@ -434,8 +421,8 @@ namespace webApiipAweb.Migrations
                     b.Property<int?>("idMunicipality")
                         .HasColumnType("int");
 
-                    b.Property<int?>("idSchool")
-                        .HasColumnType("int");
+                    b.Property<string>("idSchool")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("imagePath")
                         .HasColumnType("nvarchar(max)");
@@ -489,10 +476,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.LevelStudingExecution", b =>
                 {
-                    b.Property<int>("idLevelStudingExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idLevelStudingExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ChildId")
                         .HasColumnType("nvarchar(450)");
@@ -516,8 +501,8 @@ namespace webApiipAweb.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("idArea")
-                        .HasColumnType("int");
+                    b.Property<string>("idArea")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
@@ -546,10 +531,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.School", b =>
                 {
-                    b.Property<int>("idSchool")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idSchool")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("idMunicipality")
                         .HasColumnType("int");
@@ -566,10 +549,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.SessionChapterExecution", b =>
                 {
-                    b.Property<int>("idSessionChapterExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idSessionChapterExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("activeSession")
                         .HasColumnType("bit");
@@ -580,8 +561,8 @@ namespace webApiipAweb.Migrations
                     b.Property<DateTime?>("endDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("idChapterExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idChapterExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("idChild")
                         .HasColumnType("nvarchar(450)");
@@ -597,16 +578,14 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.SessionProgress", b =>
                 {
-                    b.Property<int>("idSessionProgress")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idSessionProgress")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("StatusTaskExecution")
                         .HasColumnType("int");
 
-                    b.Property<int>("idSessionChapterExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idSessionChapterExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("taskNumber")
                         .HasColumnType("int");
@@ -620,23 +599,21 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.Solution", b =>
                 {
-                    b.Property<int>("idSolution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idSolution")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("TaskWithClosedAnswidTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTaskWithClosedAnsw")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idTaskWithOpenAnsw")
-                        .HasColumnType("int");
+                    b.Property<string>("idTaskWithOpenAnsw")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("url")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("idSolution");
 
-                    b.HasIndex("TaskWithClosedAnswidTask");
+                    b.HasIndex("idTaskWithClosedAnsw");
 
                     b.HasIndex("idTaskWithOpenAnsw");
 
@@ -665,13 +642,11 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.SubjectExecution", b =>
                 {
-                    b.Property<int>("idSubjectExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idSubjectExecution")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idLevelStudingExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idLevelStudingExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("idSubject")
                         .HasColumnType("int");
@@ -687,16 +662,20 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithClosedAnsw", b =>
                 {
-                    b.Property<int>("idTask")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTask")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
-                    b.Property<int?>("idTestPack")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("dateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("header")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("idTestPack")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("isIncreasedComplexity")
                         .HasColumnType("bit");
@@ -719,22 +698,20 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithClosedAnswsExecution", b =>
                 {
-                    b.Property<int>("idTaskExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTaskExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("idAnswearOnTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idAnswearOnTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("idTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("idTestPackExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestPackExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("lockedTime")
                         .HasColumnType("datetime2");
@@ -758,10 +735,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithOpenAnsw", b =>
                 {
-                    b.Property<int>("idTask")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTask")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("ResultType")
                         .HasColumnType("int");
@@ -769,14 +744,20 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("dateCreated")
+                        .HasColumnType("datetime2");
+
                     b.Property<double>("fine")
                         .HasColumnType("float");
+
+                    b.Property<string>("header")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("htmlModel")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("idTestPack")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestPack")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("isIncreasedComplexity")
                         .HasColumnType("bit");
@@ -802,10 +783,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TaskWithOpenAnswsExecution", b =>
                 {
-                    b.Property<int>("idTaskExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTaskExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AnswearResult")
                         .HasColumnType("nvarchar(max)");
@@ -813,11 +792,11 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("idTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("idTestPackExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestPackExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("lockedTime")
                         .HasColumnType("datetime2");
@@ -839,10 +818,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TestPack", b =>
                 {
-                    b.Property<int>("idTestPack")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTestPack")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -850,8 +827,8 @@ namespace webApiipAweb.Migrations
                     b.Property<string>("header")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("idChapter")
-                        .HasColumnType("int");
+                    b.Property<string>("idChapter")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("idTestPack");
 
@@ -862,16 +839,14 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TestPackExecution", b =>
                 {
-                    b.Property<int>("idTestPackExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTestPackExecution")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idChapterExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idChapterExecution")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idTestPack")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestPack")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("idTestPackExecution");
 
@@ -884,13 +859,11 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TestTask", b =>
                 {
-                    b.Property<int>("idTestTask")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTestTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("idTestPack")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestPack")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("textQuestion")
                         .HasColumnType("nvarchar(max)");
@@ -904,22 +877,20 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TestTaskExecution", b =>
                 {
-                    b.Property<int>("idTestTaskExecution")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTestTaskExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("StatusExecution")
                         .HasColumnType("int");
 
-                    b.Property<int?>("idAnswearOnTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idAnswearOnTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idTestTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idTryingTestTask")
-                        .HasColumnType("int");
+                    b.Property<string>("idTryingTestTask")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("idTestTaskExecution");
 
@@ -934,10 +905,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TheoreticalMaterial", b =>
                 {
-                    b.Property<int>("idTheoreticalMaterial")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTheoreticalMaterial")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("additionalMaterial")
                         .HasColumnType("nvarchar(max)");
@@ -948,8 +917,8 @@ namespace webApiipAweb.Migrations
                     b.Property<string>("header")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("idChapter")
-                        .HasColumnType("int");
+                    b.Property<string>("idChapter")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("idTheoreticalMaterial");
 
@@ -960,16 +929,14 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TheoreticalMaterialResource", b =>
                 {
-                    b.Property<int>("idTheoreticalMaterialResource")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTheoreticalMaterialResource")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("header")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("idTheoreticalMaterial")
-                        .HasColumnType("int");
+                    b.Property<string>("idTheoreticalMaterial")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("url")
                         .HasColumnType("nvarchar(max)");
@@ -983,10 +950,8 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TheorySession", b =>
                 {
-                    b.Property<int>("idTheorySession")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTheorySession")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("active")
                         .HasColumnType("bit");
@@ -997,8 +962,8 @@ namespace webApiipAweb.Migrations
                     b.Property<DateTime?>("endDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("idChapterExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idChapterExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("idChild")
                         .HasColumnType("nvarchar(450)");
@@ -1106,16 +1071,17 @@ namespace webApiipAweb.Migrations
 
             modelBuilder.Entity("webApiipAweb.Models.TryingTestTask", b =>
                 {
-                    b.Property<int>("idTryingTestTask")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("idTryingTestTask")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("idTestPackExecution")
-                        .HasColumnType("int");
+                    b.Property<string>("idTestPackExecution")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("result")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("startDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("status")
                         .HasColumnType("nvarchar(max)");
@@ -1219,9 +1185,7 @@ namespace webApiipAweb.Migrations
 
                     b.HasOne("webApiipAweb.Models.Achivment", "Achivment")
                         .WithMany("AchivmentExecutions")
-                        .HasForeignKey("idAchivment")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idAchivment");
 
                     b.Navigation("Achivment");
 
@@ -1247,9 +1211,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.TaskWithOpenAnsw", "TaskWithOpenAnsw")
                         .WithMany("AnswearOnTaskOpens")
-                        .HasForeignKey("idTask")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idTask");
 
                     b.Navigation("TaskWithOpenAnsw");
                 });
@@ -1316,9 +1278,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.Chapter", "Chapter")
                         .WithMany("ChapterExecutions")
-                        .HasForeignKey("idChapter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idChapter");
 
                     b.HasOne("webApiipAweb.Models.SubjectExecution", "SubjectExecution")
                         .WithMany("ChapterExecutions")
@@ -1365,9 +1325,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.Area", "Area")
                         .WithMany("Municipalities")
-                        .HasForeignKey("idArea")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idArea");
 
                     b.Navigation("Area");
                 });
@@ -1387,9 +1345,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.ChapterExecution", "ChapterExecution")
                         .WithMany("SessionChapterExecutions")
-                        .HasForeignKey("idChapterExecution")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idChapterExecution");
 
                     b.HasOne("webApiipAweb.Models.Child", "Child")
                         .WithMany("SessionChapterExecutions")
@@ -1404,24 +1360,22 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.SessionChapterExecution", "SessionChapterExecution")
                         .WithMany("SessionProgresses")
-                        .HasForeignKey("idSessionChapterExecution")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idSessionChapterExecution");
 
                     b.Navigation("SessionChapterExecution");
                 });
 
             modelBuilder.Entity("webApiipAweb.Models.Solution", b =>
                 {
-                    b.HasOne("webApiipAweb.Models.TaskWithClosedAnsw", null)
+                    b.HasOne("webApiipAweb.Models.TaskWithClosedAnsw", "TaskWithClosedAnsw")
                         .WithMany("Solutions")
-                        .HasForeignKey("TaskWithClosedAnswidTask");
+                        .HasForeignKey("idTaskWithClosedAnsw");
 
                     b.HasOne("webApiipAweb.Models.TaskWithOpenAnsw", "TaskWithOpenAnsw")
                         .WithMany("Solutions")
-                        .HasForeignKey("idTaskWithOpenAnsw")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idTaskWithOpenAnsw");
+
+                    b.Navigation("TaskWithClosedAnsw");
 
                     b.Navigation("TaskWithOpenAnsw");
                 });
@@ -1441,9 +1395,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.LevelStudingExecution", "LevelStudingExecution")
                         .WithMany("SubjectExecutions")
-                        .HasForeignKey("idLevelStudingExecution")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idLevelStudingExecution");
 
                     b.HasOne("webApiipAweb.Models.Subject", "Subject")
                         .WithMany("SubjectExecutions")
@@ -1512,9 +1464,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.Chapter", "Chapter")
                         .WithMany("TestPacks")
-                        .HasForeignKey("idChapter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idChapter");
 
                     b.Navigation("Chapter");
                 });
@@ -1523,15 +1473,11 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.ChapterExecution", "ChapterExecution")
                         .WithMany("TestPackExecutions")
-                        .HasForeignKey("idChapterExecution")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idChapterExecution");
 
                     b.HasOne("webApiipAweb.Models.TestPack", "TestPack")
                         .WithMany("TestPackExecutions")
-                        .HasForeignKey("idTestPack")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idTestPack");
 
                     b.Navigation("ChapterExecution");
 
@@ -1555,15 +1501,11 @@ namespace webApiipAweb.Migrations
 
                     b.HasOne("webApiipAweb.Models.TestTask", "TestTask")
                         .WithMany()
-                        .HasForeignKey("idTestTask")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idTestTask");
 
                     b.HasOne("webApiipAweb.Models.TryingTestTask", "TryingTestTask")
                         .WithMany("TestTaskExecutions")
-                        .HasForeignKey("idTryingTestTask")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idTryingTestTask");
 
                     b.Navigation("AnswearOnTask");
 
@@ -1576,9 +1518,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.Chapter", "Chapter")
                         .WithMany("TheoreticalMaterials")
-                        .HasForeignKey("idChapter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idChapter");
 
                     b.Navigation("Chapter");
                 });
@@ -1587,9 +1527,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.TheoreticalMaterial", "TheoreticalMaterial")
                         .WithMany("TheoreticalMaterialResources")
-                        .HasForeignKey("idTheoreticalMaterial")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idTheoreticalMaterial");
 
                     b.Navigation("TheoreticalMaterial");
                 });
@@ -1598,9 +1536,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.ChapterExecution", "ChapterExecution")
                         .WithMany("TheorySessions")
-                        .HasForeignKey("idChapterExecution")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idChapterExecution");
 
                     b.HasOne("webApiipAweb.Models.Child", "Child")
                         .WithMany("TheorySessions")
@@ -1654,9 +1590,7 @@ namespace webApiipAweb.Migrations
                 {
                     b.HasOne("webApiipAweb.Models.TestPackExecution", "TestPackExecution")
                         .WithMany("TryingTestTasks")
-                        .HasForeignKey("idTestPackExecution")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("idTestPackExecution");
 
                     b.Navigation("TestPackExecution");
                 });

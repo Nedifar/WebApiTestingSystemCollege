@@ -92,7 +92,7 @@ namespace webApiipAweb.Controllers
                                 {
                                     var sessionsFiltred = user.SessionChapterExecutions.Where(p => p.ChapterExecution.Chapter.name == chapter.name).ToList();
                                     List<string> arraySessions = new();
-                                    var sessionSorted = sessionsFiltred.OrderByDescending(p => p.idSessionChapterExecution)
+                                    var sessionSorted = sessionsFiltred.OrderByDescending(p => p.beginDateTime)
                                         .FirstOrDefault()?.SessionProgresses
                                         .OrderBy(p => p.taskNumber)
                                         .ToList();
@@ -111,9 +111,9 @@ namespace webApiipAweb.Controllers
 
                                     arraySessions.Clear();
 
-                                    foreach (var session in sessionsFiltred.OrderByDescending(p => p.idSessionChapterExecution))
+                                    foreach (var session in sessionsFiltred.OrderByDescending(p => p.beginDateTime))
                                     {
-                                        session.SessionProgresses.ForEach(item =>
+                                        session.SessionProgresses.OrderBy(p => p.taskNumber).ToList().ForEach(item =>
                                         {
                                             arraySessions.Add(item.GetStatus());
                                         });
@@ -156,30 +156,34 @@ namespace webApiipAweb.Controllers
 
         public void Write(int column, params object[] content)
         {
-            foreach (var cellValue in content)
+            try
             {
-                if (cellValue.ToString() != "Ожидает выполнения"
-    && cellValue.ToString() != "Решено неверно"
-    && cellValue.ToString() != "Решено верно")
+                foreach (var cellValue in content)
                 {
-                    xL.Cell(selectedRow, column).Value = cellValue.ToString();
-                }
-                else
-                {
-                    xL.Cell(selectedRow, column).Style.Fill.BackgroundColor = cellValue.ToString() switch
+                    if (cellValue.ToString() != "Ожидает выполнения"
+        && cellValue.ToString() != "Решено неверно"
+        && cellValue.ToString() != "Решено верно")
                     {
-                        "Ожидает выполнения" => XLColor.Orange,
-                        "Решено неверно" => XLColor.Red,
-                        "Решено верно" => XLColor.Green,
-                        _ => XLColor.Transparent
-                    };
-                    xL.Cell(selectedRow, column).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
-                    xL.Cell(selectedRow, column).Style.Border.TopBorder = XLBorderStyleValues.Thin;
-                    xL.Cell(selectedRow, column).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
-                    xL.Cell(selectedRow, column).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                        xL.Cell(selectedRow, column).Value = cellValue.ToString();
+                    }
+                    else
+                    {
+                        xL.Cell(selectedRow, column).Style.Fill.BackgroundColor = cellValue.ToString() switch
+                        {
+                            "Ожидает выполнения" => XLColor.Orange,
+                            "Решено неверно" => XLColor.Red,
+                            "Решено верно" => XLColor.Green,
+                            _ => XLColor.Transparent
+                        };
+                        xL.Cell(selectedRow, column).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                        xL.Cell(selectedRow, column).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+                        xL.Cell(selectedRow, column).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                        xL.Cell(selectedRow, column).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                    }
+                    column++;
                 }
-                column++;
             }
+            catch { }
             selectedRow++;
         }
 

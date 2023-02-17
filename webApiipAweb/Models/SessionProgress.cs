@@ -7,12 +7,12 @@ namespace webApiipAweb.Models
     public class SessionProgress
     {
         [Key]
-        public int idSessionProgress { get; set; }
+        public string idSessionProgress { get; set; } = Guid.NewGuid().ToString();
 
         public int taskNumber { get; set; }
 
         [ForeignKey("SessionChapterExecution")]
-        public int idSessionChapterExecution { get; set; }
+        public string idSessionChapterExecution { get; set; }
 
         public virtual SessionChapterExecution SessionChapterExecution { get; set; }
 

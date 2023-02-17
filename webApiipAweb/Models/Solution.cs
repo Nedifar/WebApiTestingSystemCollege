@@ -11,14 +11,16 @@ namespace webApiipAweb.Models
     public class Solution
     {
         [Key]
-        public int idSolution { get; set; }
+        public string idSolution { get; set; } = Guid.NewGuid().ToString();
 
         public string url { get; set; }
 
         [ForeignKey("TaskWithOpenAnsw")]
-        public int idTaskWithOpenAnsw { get; set; }
-
-        [JsonIgnore]
+        public string idTaskWithOpenAnsw { get; set; }
         public virtual TaskWithOpenAnsw TaskWithOpenAnsw { get; set; }
+
+        [ForeignKey("TaskWithClosedAnsw")]
+        public string idTaskWithClosedAnsw { get; set; }
+        public virtual TaskWithClosedAnsw TaskWithClosedAnsw { get; set; }
     }
 }

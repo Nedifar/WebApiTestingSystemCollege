@@ -10,9 +10,11 @@ namespace webApiipAweb.Models
     public class AchivmentExecution
     {
         [Key]
-        public int idAchivmentExecution { get; set; }
+        public string idAchivmentExecution { get; set; } = Guid.NewGuid().ToString();
+
         [ForeignKey("Achivment")]
-        public int idAchivment { get; set; }
+        public string idAchivment { get; set; }
+        
         public virtual Achivment Achivment { get; set; }
         [ForeignKey("Child")]
         public string ChildId { get; set; }

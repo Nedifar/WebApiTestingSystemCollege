@@ -114,7 +114,11 @@ namespace webApiipAweb.Controllers
                                 textAppeal = s.textAppeal,
                                 type = s.TypeAppeal.typeName
                             }),
-                            image = imageUrl
+                            image = imageUrl,
+                            roles = child.UserRoles.Select(p => new
+                            {
+                                p.Role.Name
+                            })
                         });
                     }
                 }
@@ -165,6 +169,8 @@ namespace webApiipAweb.Controllers
                         "User",
                         new { userId = ch.Id, code = code },
                         protocol: HttpContext.Request.Scheme);
+                    callbackUrl = callbackUrl.Replace("http://localhost:5000", "https://gamification.oksei.ru/gameserv");
+                    callbackUrl = callbackUrl.Replace("192.168.147.72:81", "gamification.oksei.ru");
                     EmailService emailService = new EmailService();
                     await emailService.SendEmailAsync(ch.Email, "Confirm your account",
                         $"Пожалуйста, подтвердите почту по ссылке: <a href='{callbackUrl}'>link</a>");
@@ -554,6 +560,6 @@ namespace webApiipAweb.Controllers
 
     public class PostResultChapetModel
     {
-        public int idChapterExecution { get; set; }
+        public string idChapterExecution { get; set; }
     }
 }

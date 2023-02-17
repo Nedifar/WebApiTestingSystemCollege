@@ -11,7 +11,7 @@ namespace webApiipAweb.Models
     public class Chapter
     {
         [Key]
-        public int idChapter { get; set; }
+        public string idChapter { get; set; } = Guid.NewGuid().ToString();
 
         public string name { get; set; }
 
@@ -20,6 +20,8 @@ namespace webApiipAweb.Models
         public bool access { get; set; }
 
         public int numeric { get; set; }
+
+        public bool isVisible { get; set; } = true;
 
         [ForeignKey("Subject")]
         public int idSubject { get; set; }

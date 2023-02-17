@@ -10,12 +10,12 @@ namespace webApiipAweb.Models
     public class TestPack
     {
         [Key]
-        public int idTestPack { get; set; }
+        public string idTestPack { get; set; } = Guid.NewGuid().ToString();
 
         public string header { get; set; }
 
         [ForeignKey("Chapter")]
-        public int idChapter { get; set; }
+        public string idChapter { get; set; }
 
         public virtual Chapter Chapter { get; set; }
 

@@ -7,7 +7,7 @@ namespace webApiipAweb.PostTestModels
 {
     public class GetTaskOpenOnNumberPost
     {
-        public int idExecChapter { get; set; }
+        public string idExecChapter { get; set; }
         public int serialNumber {get; set;}
         public string headerTestPack { get; set; }
     }

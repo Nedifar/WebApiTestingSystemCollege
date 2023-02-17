@@ -9,7 +9,7 @@ namespace webApiipAweb.Models
     public class Achivment
     {
         [Key]
-        public int idAchivment { get; set; }
+        public string idAchivment { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; }
         public string Term { get; set; }
         public virtual List<AchivmentExecution> AchivmentExecutions { get; set; } = new List<AchivmentExecution>();

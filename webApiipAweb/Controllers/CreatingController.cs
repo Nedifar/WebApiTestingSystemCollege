@@ -239,38 +239,37 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if (context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName && p.name == model.chapter).FirstOrDefault() == null)
+                var testPack = context.TestPacks.FirstOrDefault(p => p.idTestPack == model.idTestPack);
+                if (testPack == null)
                 {
-                    return BadRequest("Данного класса, предмета или раздела не существует.");
-                }
-                var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
-
-                var testTask = new Models.TaskWithOpenAnsw { textQuestion = model.textQuestion, theme = model.theme, isIncreasedComplexity = model.isIncreasedComplexity };
-
-                foreach (var item in model.answears)
-                {
-                    testTask.AnswearOnTaskOpens.Add(new Models.AnswearOnTaskOpen { answear = item.answear, mark = item.mark });
+                    return BadRequest("Данного кейса не существует");
                 }
 
-                foreach (var mod in model.CreatingSolutionModels)
-                {
-                    using (var hhtp = new HttpClient())
-                    {
-                        var content = new MultipartFormDataContent();
-                        content.Add(new StringContent(mod.base64image), "source");
-                        var request = await hhtp.PostAsync("https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a5&format=json", content);
-                        request.EnsureSuccessStatusCode();
-                        var res = request.Content.ReadAsAsync<PostModels.Rootobject>().Result;
-                        testTask.Solutions.Add(new Models.Solution { url = res.image.url });
-                    }
-                }
+                var openTask = new Models.TaskWithOpenAnsw { 
+                    textQuestion = model.textQuestion, 
+                    theme = model.theme, 
+                    isIncreasedComplexity = model.isIncreasedComplexity,
+                    fine = model.fine,
+                    orderImportant = model.orderImportant,
+                    ResultType = model.resultType,
+                };
 
-                if (selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault() == null)
+                openTask.htmlModel = (model.resultType) switch //здесь 3 вариант не работает
                 {
-                    return BadRequest("Данной тестовой коллекции не существует.");
-                }
+                    Models.ResultTypes.Label => "<input type=\"text\" class=\"task__input\">",
+                    Models.ResultTypes.Squares => "<div class=\"task__multiple-input\"> \r\n<input type=\"text\" class=\"task__input\"> \r\n<input type=\"text\" class=\"task__input\"> \r\n</div>\r\n",
+                    Models.ResultTypes.Table => "<div data-columns=\"5\" class=\"task__input-table\">\r\n              <div class=\"task__table-cell\">А</div>\r\n              <div class=\"task__table-cell\">Б</div>\r\n              <div class=\"task__table-cell\">В</div>\r\n              <div class=\"task__table-cell\">Г</div>\r\n              <div class=\"task__table-cell\">Д</div>\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n            </div>\r\n"
+                };
 
-                var listTasks = selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().GetNumbers();
+                openTask.AnswearOnTaskOpens.Add(new Models.AnswearOnTaskOpen
+                {
+                    mark = model.answear.mark,
+                    answear = model.answear.answear
+                });
+
+                openTask.Solutions.Add(new Models.Solution { url = model.solution });
+
+                var listTasks = testPack.GetNumbers();
 
                 switch (model.mode)
                 {
@@ -279,11 +278,11 @@ namespace webApiipAweb.Controllers
                         {
                             listTasks[i].numericInPack = i + 2;
                         }
-                        testTask.numericInPack = 1;
+                        openTask.numericInPack = 1;
                         break;
                     case PostModels.ModeCreating.End:
 
-                        testTask.numericInPack = listTasks.Count + 1;
+                        openTask.numericInPack = listTasks.Count + 1;
                         break;
                     case PostModels.ModeCreating.Insert:
                         if (model.numberInList == null)
@@ -295,27 +294,14 @@ namespace webApiipAweb.Controllers
                             else
                                 listTasks[i].numericInPack = i + 2;
                         }
-                        testTask.numericInPack = model.numberInList.Value;
+                        openTask.numericInPack = model.numberInList.Value;
                         break;
                     default:
                         break;
                 }
-                selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TaskWithOpenAnsws.Add(testTask);
-                await context.SaveChangesAsync();
-                var task = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault()
-                    .TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault()
-                    .TaskWithOpenAnsws.OrderByDescending(p => p.idTask).FirstOrDefault();
-                try
-                {
-                    var modelImageSet = new { name = task.idTask, base64 = model.answears }; //????????????
-                    using (var http = new HttpClient())
-                    {
-                        var request = await http.PostAsync("http://192.168.147.72:83/api/userprofileimage", modelImageSet, new JsonMediaTypeFormatter());
-                        task.textQuestion = $"images/task{task.idTask}.jpeg";
-                    }
-                }
-                catch { return BadRequest("Проблемы с добавлением изображения."); }
 
+                testPack.TaskWithOpenAnsws.Add(openTask);
+                await context.SaveChangesAsync();
                 return Ok("Объект успешно создан.");
             }
             catch (Exception ex)

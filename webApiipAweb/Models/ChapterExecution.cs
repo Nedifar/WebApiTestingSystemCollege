@@ -10,15 +10,15 @@ namespace webApiipAweb.Models
     public class ChapterExecution
     {
         [Key]
-        public int idChapterExecution { get; set; }
+        public string idChapterExecution { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("Chapter")]
-        public int idChapter { get; set; }
+        public string idChapter { get; set; }
 
         public virtual Chapter Chapter { get; set; }
 
         [ForeignKey("SubjectExecution")]
-        public int? idSubjectExecution { get; set; }
+        public string idSubjectExecution { get; set; }
 
         public virtual SubjectExecution SubjectExecution { get; set; }
 

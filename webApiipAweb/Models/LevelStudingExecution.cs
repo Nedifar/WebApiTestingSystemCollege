@@ -10,13 +10,16 @@ namespace webApiipAweb.Models
     public class LevelStudingExecution
     {
         [Key]
-        public int idLevelStudingExecution { get; set; }
+        public string idLevelStudingExecution { get; set; } = Guid.NewGuid().ToString();
+
         [ForeignKey("Child")]
         public string ChildId { get; set; }
         public virtual Child Child { get; set; }
+
         [ForeignKey("LevelStuding")]
         public int idLevelStuding { get; set; }
         public virtual LevelStuding LevelStuding { get; set; }
+
         public virtual List<SubjectExecution> SubjectExecutions { get; set; } = new List<SubjectExecution>();
     }
 }

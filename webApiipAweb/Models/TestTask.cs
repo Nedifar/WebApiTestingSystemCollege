@@ -10,11 +10,14 @@ namespace webApiipAweb.Models
     public class TestTask
     {
         [Key]
-        public int idTestTask { get; set; }
+        public string idTestTask { get; set; } = Guid.NewGuid().ToString();
+
         public string textQuestion { get; set; }
+
         public virtual List<AnswearOnTask> AnswearOnTasks { get; set; } = new List<AnswearOnTask>();
+
         [ForeignKey("TestPack")]
-        public int? idTestPack { get; set; }
+        public string idTestPack { get; set; }
         public virtual TestPack TestPack { get; set; }
     }
 }

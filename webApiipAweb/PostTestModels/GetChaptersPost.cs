@@ -7,11 +7,11 @@ namespace webApiipAweb.PostTestModels
 {
     public class GetChaptersPost
     {
-        public int idSubjectExecution { get; set; }
+        public string idSubjectExecution { get; set; }
     }
 
     public class EndSessionViewModel
     {
-        public int idChapterExecution { get; set; }
+        public string idChapterExecution { get; set; }
     }
 }

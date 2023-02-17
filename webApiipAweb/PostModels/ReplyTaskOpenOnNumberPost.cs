@@ -7,7 +7,7 @@ namespace webApiipAweb.PostModels
 {
     public class ReplyTaskOpenOnNumberPost
     {
-        public int idExecChapter { get; set; }
+        public string idExecChapter { get; set; }
         public int serialNumber { get; set; }
         public string answear { get; set; }
         public string testPackHeader { get; set; }

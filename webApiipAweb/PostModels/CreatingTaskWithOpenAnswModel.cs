@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using webApiipAweb.Models;
 
 namespace webApiipAweb.PostModels
 {
@@ -10,26 +11,27 @@ namespace webApiipAweb.PostModels
     {
         public string textQuestion { get; set; }
 
-        public string levelStuding { get; set; }
-
-        public string subjectName { get; set; }
-
-        public string chapter { get; set; }
-
-        public List<AnsModel> answears { get; set; } = new List<AnsModel>();
+        public string idTestPack { get; set; }
 
         public string theme { get; set; }
-
-        public string testPackHeader { get; set; }
 
         public int? numberInList { get; set; }
 
         public bool isIncreasedComplexity { get; set; } = false;
 
+        public bool orderImportant { get; set; } = true;
+
+        public double fine { get; set; } = 1;
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ResultTypes resultType { get; set; }
+
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ModeCreating mode { get; set; } = ModeCreating.End;
 
-        public virtual List<CreatingSolutionModel> CreatingSolutionModels { get; set; } = new List<CreatingSolutionModel>();
+        public string solution { get; set; }
+
+        public AnsModel answear { get; set; }
     }
 
     public enum ModeCreating
@@ -41,7 +43,8 @@ namespace webApiipAweb.PostModels
 
     public class AnsModel
     {
+        public double mark { get; set; } = 1;
+
         public string answear { get; set; }
-        public double mark { get; set; }
     }
 }

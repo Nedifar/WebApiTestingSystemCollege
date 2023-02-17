@@ -11,13 +11,20 @@ namespace webApiipAweb.Models
     public class TryingTestTask
     {
         [Key]
-        public int idTryingTestTask { get; set; }
+        public string idTryingTestTask { get; set; } = Guid.NewGuid().ToString();
+
         public int result { get; set; }
+
         public string status { get; set; }
+
+        public DateTime startDate { get; set; } = DateTime.Now;
+
         [ForeignKey("TestPackExecution")]
-        public int idTestPackExecution { get; set; }
+        public string idTestPackExecution { get; set; }
         public virtual TestPackExecution TestPackExecution { get; set; }
+
         public virtual List<TestTaskExecution> TestTaskExecutions { get; set; } = new List<TestTaskExecution>();
+
         public int timeExecutionInSecond { get; set; }
     }
 }

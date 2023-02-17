@@ -8,7 +8,7 @@ namespace webApiipAweb.Models
     public class SessionChapterExecution
     {
         [Key]
-        public int idSessionChapterExecution { get; set; }
+        public string idSessionChapterExecution { get; set; } = Guid.NewGuid().ToString();
 
         public DateTime? beginDateTime { get; set; }
 
@@ -20,7 +20,7 @@ namespace webApiipAweb.Models
         public virtual Child Child { get; set; }
 
         [ForeignKey("ChapterExecution")]
-        public int idChapterExecution { get; set; }
+        public string idChapterExecution { get; set; }
 
         public virtual ChapterExecution ChapterExecution { get; set; }
 

@@ -10,15 +10,15 @@ namespace webApiipAweb.Models
     public class TestPackExecution
     {
         [Key]
-        public int idTestPackExecution { get; set; }
+        public string idTestPackExecution { get; set; } = Guid.NewGuid().ToString();
 
         [ForeignKey("ChapterExecution")]
-        public int idChapterExecution { get; set; }
+        public string idChapterExecution { get; set; }
 
         public virtual ChapterExecution ChapterExecution { get; set; }
 
         [ForeignKey("TestPack")]
-        public int idTestPack { get; set; }
+        public string idTestPack { get; set; }
 
         public virtual TestPack TestPack { get; set; }
 

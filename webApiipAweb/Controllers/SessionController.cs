@@ -32,7 +32,7 @@ namespace webApiipAweb.Controllers
             var currentChapterExecution = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == endSession.idChapterExecution);
             if (currentChapterExecution == null)
                 return NotFound("Такого раздела не существует.");
-            var currentSession = currentChapterExecution.TheorySessions.OrderByDescending(p => p.idTheorySession)
+            var currentSession = currentChapterExecution.TheorySessions.OrderByDescending(p => p.beginDate)
                 .FirstOrDefault(p => p.active);
             if (currentSession == null)
                 return NotFound("Активной сессии не существует.");
@@ -50,7 +50,7 @@ namespace webApiipAweb.Controllers
             var currentSession = s?.FirstOrDefault()
                 ?.SubjectExecution.LevelStudingExecution.Child.SessionChapterExecutions
                 .Where(p => p.idChapterExecution == s?.FirstOrDefault().idChapterExecution)
-                .OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault();
+                .OrderByDescending(p => p.beginDateTime).FirstOrDefault();
             if (currentSession == null || !currentSession.activeSession)
             {
                 return BadRequest("Сессии не существует.");
@@ -63,6 +63,7 @@ namespace webApiipAweb.Controllers
             {
                 currentSession.SessionProgresses.Add(new()
                 {
+
                     taskNumber = counter,
                     StatusTaskExecution = task.Status
                 });
@@ -89,7 +90,7 @@ namespace webApiipAweb.Controllers
                         chapter = subject.ChapterExecutions.Select(chapter => new
                         {
                             name = chapter.Chapter.name,
-                            sessions = chapter.SessionChapterExecutions.Select(session => new
+                            sessions = chapter.SessionChapterExecutions.OrderBy(p=>p.beginDateTime).Select(session => new
                             {
                                 idSes = session.idSessionChapterExecution,
                                 beginDateTime = session.beginDateTime,
@@ -105,7 +106,7 @@ namespace webApiipAweb.Controllers
                                 }),
 
                             }),
-                            FinishResults = chapter.SessionChapterExecutions.OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault()
+                            FinishResults = chapter.SessionChapterExecutions.OrderByDescending(p => p.beginDateTime).FirstOrDefault()
                             ?.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
                             {
                                 taskNumber = sessionProgress.taskNumber,
@@ -119,7 +120,7 @@ namespace webApiipAweb.Controllers
 
         [HttpGet]
         [Route("getSessionOfChild")]
-        public async Task<ActionResult> GetSessionOfChild([FromQuery] string idChild, [FromQuery] int idChapter)
+        public async Task<ActionResult> GetSessionOfChild([FromQuery] string idChild, [FromQuery] string idChapter)
         {
             await BeforeSessionResponse();
             var child = await context.Children.FirstOrDefaultAsync(p => p.Id == idChild);
@@ -130,7 +131,8 @@ namespace webApiipAweb.Controllers
                 : Ok(new
                 {
                     name = child.lastName + " " + child.firstName,
-                    theorySessions = currentChapterExecution.TheorySessions.Select(session => new
+                    theorySessions = currentChapterExecution.TheorySessions
+                    .Select(session => new
                     {
                         beginDateTime = session.beginDate,
                         endDateTime = session.endDate,
@@ -138,7 +140,8 @@ namespace webApiipAweb.Controllers
                         status = session.active ? "Активна" : "Завершена",
                         nameChapter = session.ChapterExecution.Chapter.name,
                     }),
-                    sessions = currentChapterSessions.OrderBy(p => p.idSessionChapterExecution).Select(session => new
+                    sessions = currentChapterSessions.OrderBy(p => p.beginDateTime)
+                    .Select(session => new
                     {
                         beginDateTime = session.beginDateTime,
                         endDateTime = session.endDateTime,
@@ -152,7 +155,7 @@ namespace webApiipAweb.Controllers
                             status = sessionProgress.GetStatus()
                         }),
                     }),
-                    FinishResults = currentChapterSessions.OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault()
+                    FinishResults = currentChapterSessions.OrderByDescending(p => p.beginDateTime).FirstOrDefault()
                             ?.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
                             {
                                 taskNumber = sessionProgress.taskNumber,
@@ -163,7 +166,7 @@ namespace webApiipAweb.Controllers
 
         [HttpGet]
         [Route("getChildrenOfChapter")]
-        public async Task<ActionResult> getChildrenOfChapter([FromQuery] int idChapter, [FromQuery] int idSchool)
+        public async Task<ActionResult> getChildrenOfChapter([FromQuery] string idChapter, [FromQuery] string idSchool)
         {
             var children = await context.Children.Where(p => p.idSchool == idSchool
             && p.LevelStudingExecutions.FirstOrDefault(level => level.SubjectExecutions.FirstOrDefault(p => p.ChapterExecutions.FirstOrDefault(p => p.idChapter == idChapter) is ChapterExecution) is SubjectExecution) is LevelStudingExecution)
@@ -242,7 +245,7 @@ namespace webApiipAweb.Controllers
         {
             var s = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == startTheorySession.idChapterExecution);
             var currentTheorySession = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == s.idChapterExecution)
-                .TheorySessions.OrderByDescending(p => p.idTheorySession).FirstOrDefault();
+                .TheorySessions.OrderByDescending(p => p.beginDate).FirstOrDefault();
             if (currentTheorySession != null && currentTheorySession.beginDate.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && currentTheorySession.active)
             {
                 currentTheorySession.active = false;
@@ -270,7 +273,7 @@ namespace webApiipAweb.Controllers
         {
             var s = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == startSession.idChapterExecution);
             var currentSession = s.SessionChapterExecutions
-                .OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault();
+                .OrderByDescending(p => p.beginDateTime).FirstOrDefault();
             if (currentSession != null && currentSession.beginDateTime.Value.AddHours(1) < DateTime.UtcNow.AddHours(5) && currentSession.activeSession)
             {
                 currentSession.activeSession = false;
@@ -358,8 +361,10 @@ namespace webApiipAweb.Controllers
                                 }),
 
                             }),
-                            FinishResults = chapter.SessionChapterExecutions.OrderByDescending(p => p.idSessionChapterExecution).FirstOrDefault()
-                            ?.SessionProgresses.OrderBy(p => p.taskNumber).Select(sessionProgress => new
+                            FinishResults = chapter.SessionChapterExecutions.OrderByDescending(p => p.beginDateTime)
+                            .FirstOrDefault()?.SessionProgresses
+                            .OrderBy(p => p.taskNumber)
+                            .Select(sessionProgress => new
                             {
                                 taskNumber = sessionProgress.taskNumber,
                                 status = sessionProgress.GetStatus() == "Ожидает выполнения" ? "Решено неверно" : sessionProgress.GetStatus()
