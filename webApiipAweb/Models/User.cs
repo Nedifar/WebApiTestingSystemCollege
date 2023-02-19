@@ -16,6 +16,8 @@ namespace webApiipAweb.Models
 
         public int levelStuding { get; set; }
 
+        public string levelWord { get; set; }
+
         public double point { get; set; }   
 
         public double spendPoint { get; set; }

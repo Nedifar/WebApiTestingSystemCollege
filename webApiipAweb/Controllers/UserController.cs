@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
@@ -124,8 +125,60 @@ namespace webApiipAweb.Controllers
                 }
                 return BadRequest("Неправильный логин email или пароль");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles ="admin")]
+        [Route("adminReg")]
+        public async Task<ActionResult> AdminRegistration(RegPost model)
+        {
+            var ch = new Child();
+            try
+            {
+                if (context.Users.Any(p => p.Email == model.email))
+                {
+                    return BadRequest("Данный email уже используется.");
+                }
+
+                ch = new Child
+                {
+                    Email = model.email,
+                    levelStuding = model.levelStuding,
+                    lastName = model.lastName,
+                    firstName = model.firstName,
+                    EmailConfirmed = true,
+                    levelWord = model.levelWord,
+                    School = context.Schools.FirstOrDefault(p=>p.idSchool == model.idSchool)
+                };
+                ch.UserName = ch.Id;
+
+                ch.LevelStudingExecutions.Add(new LevelStudingExecution
+                {
+                    LevelStuding = context.LevelStudings.FirstOrDefault(p => p.nameLevel == ch.levelStuding.ToString())
+                });
+
+                var result = await _userManager.CreateAsync(ch, model.pas);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRolesAsync(ch, new string[] { "child" });
+
+                    return Content("Регистрация успешна.");
+                }
+                else
+                {
+                    string str = String.Empty;
+                    foreach (var ss in result.Errors)
+                        str += ss.Description + "\n";
+                    return BadRequest(str);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _userManager.DeleteAsync(ch);
                 return BadRequest(ex.Message);
             }
         }
@@ -133,15 +186,15 @@ namespace webApiipAweb.Controllers
         [HttpPost]
         [Route("reg")]
         public async Task<ActionResult> Registration(RegPost model)
-        {
-            var ch = new Models.Child();
+        { 
+            var ch = new Child();
             try
             {
-                if (context.Users.Where(p => p.Email == model.email).Count() != 0)
+                if (context.Users.Any(p => p.Email == model.email))
                 {
                     return BadRequest("Данный email уже используется.");
                 }
-                ch = new Models.Child
+                ch = new Child
                 {
                     Email = model.email,
                     levelStuding = model.levelStuding,
@@ -149,16 +202,12 @@ namespace webApiipAweb.Controllers
                     firstName = model.firstName,
                 };
                 ch.UserName = ch.Id;
-                foreach (Models.ThingPack item in context.ThingPacks.ToList())
-                {
-                    var thingExe = new Models.ThingPackExecution { ThingPack = item };
-                    foreach (var iteem in item.Things)
-                        thingExe.ThingExecutions.Add(new Models.ThingExecution { Thing = iteem });
-                    ch.ThingPackExecutions.Add(thingExe);
-                }
 
-                ch.LevelStudingExecutions.Add(new Models.LevelStudingExecution { LevelStuding = context.LevelStudings.Where(p => p.nameLevel == ch.levelStuding.ToString()).FirstOrDefault() });
-                //context.Children.Add(child);
+                ch.LevelStudingExecutions.Add(new LevelStudingExecution
+                {
+                    LevelStuding = context.LevelStudings.FirstOrDefault(p => p.nameLevel == ch.levelStuding.ToString())
+                });
+
                 var result = await _userManager.CreateAsync(ch, model.pas);
                 if (result.Succeeded)
                 {
@@ -171,9 +220,9 @@ namespace webApiipAweb.Controllers
                         protocol: HttpContext.Request.Scheme);
                     callbackUrl = callbackUrl.Replace("http://localhost:5000", "https://gamification.oksei.ru/gameserv");
                     callbackUrl = callbackUrl.Replace("192.168.147.72:81", "gamification.oksei.ru");
-                    EmailService emailService = new EmailService();
+                    EmailService emailService = new ();
                     await emailService.SendEmailAsync(ch.Email, "Confirm your account",
-                        $"Пожалуйста, подтвердите почту по ссылке: <a href='{callbackUrl}'>link</a>");
+                        $"Пожалуйста, подтвердите почту по ссылке: <a href='{callbackUrl}'>ссылка</a>");
 
                     return Content("Для завершения регистрации проверьте электронную почту и перейдите по ссылке, указанной в письме");
                 }
@@ -194,38 +243,25 @@ namespace webApiipAweb.Controllers
 
         [HttpPost]
         [Route("editProfile")]
-        public async Task<ActionResult> editProfile(EditProfileModel profileModel)
+        public async Task<ActionResult> EditProfile(EditProfileModel profileModel)
         {
             try
             {
                 var result = await _userManager.FindByIdAsync(profileModel.idUser);
                 if (result == null)
                     return BadRequest("Неверный Id");
-                using (var hhtp = new HttpClient())
+                result.firstName = profileModel.firstName;
+                result.lastName = profileModel.lastName;
+                result.levelStuding = profileModel.levelStuding;
+                if (result.LevelStudingExecutions.FirstOrDefault(p => p.LevelStuding.nameLevel == result.levelStuding.ToString()) == null)
                 {
-                    if (profileModel.base64image != null || !String.IsNullOrWhiteSpace(profileModel.base64image))
+                    result.LevelStudingExecutions.Add(new LevelStudingExecution
                     {
-                        try
-                        {
-                            var modelImageSet = new { name = profileModel.idUser, base64 = profileModel.base64image };
-                            using (var http = new HttpClient())
-                            {
-                                var request = await http.PostAsync("http://192.168.147.72:83/api/userprofileimage", modelImageSet, new JsonMediaTypeFormatter());
-                                result.imagePath = $"images/img{profileModel.idUser}.jpeg";
-                            }
-                        }
-                        catch { return BadRequest("Проблемы с добавлением изображения."); }
-                    }
-                    result.firstName = profileModel.firstName;
-                    result.lastName = profileModel.lastName;
-                    result.levelStuding = profileModel.levelStuding;
-                    if (result.LevelStudingExecutions.Where(p => p.LevelStuding.nameLevel == result.levelStuding.ToString()).FirstOrDefault() == null)
-                    {
-                        result.LevelStudingExecutions.Add(new Models.LevelStudingExecution { LevelStuding = context.LevelStudings.Where(p => p.nameLevel == result.levelStuding.ToString()).FirstOrDefault() });
-                    }
-                    context.SaveChanges();
-                    return Ok("Успешно");
+                        LevelStuding = context.LevelStudings.FirstOrDefault(p => p.nameLevel == result.levelStuding.ToString())
+                    });
                 }
+                context.SaveChanges();
+                return Ok("Успешно");
             }
             catch (Exception ex)
             {
@@ -244,11 +280,7 @@ namespace webApiipAweb.Controllers
                     var cc = await _userManager.GeneratePasswordResetTokenAsync(result);
                     result.passRecoveryCode = new Random().Next(111111, 999999).ToString();
                     context.SaveChanges();
-                    //var callbackUrl = Url.Action(
-                    //    "ConfirmEmail",
-                    //    "User",
-                    //    new { userId = result.Id, code = cc },
-                    //    protocol: HttpContext.Request.Scheme);
+
                     EmailService emailService = new EmailService();
                     await emailService.SendEmailAsync(result.Email, "Password recovery",
                         $"Код подтверждения: <a> {result.passRecoveryCode}</a>");
@@ -343,60 +375,37 @@ namespace webApiipAweb.Controllers
                 return BadRequest(errors);
             }
         }
-        [HttpPost]
-        [Route("buyThing")]
-        public async Task<ActionResult> BuyThingOfChild(BuyThingModel buyThing)
-        {
-            var result = await _userManager.FindByIdAsync(buyThing.idChild);
-            if (result == null)
-                return BadRequest("Неверный Id");
-            var res = context.Things.Where(p => p.idThing == buyThing.idThing).FirstOrDefault();
-            if (res == null)
-                return BadRequest("Такого предмета не существует");
-            var rr = result.ThingPackExecutions.Where(p => p.ThingPack.idThingPack == res.ThingPack.idThingPack).FirstOrDefault().ThingExecutions.Where(p => p.Thing.idThing == buyThing.idThing).FirstOrDefault();
-            if (rr.isFinished)
-                return BadRequest("Данная позиция уже куплена");
-            if (rr.Thing.price <= result.point)
-            {
-                result.point -= rr.Thing.price;
-                rr.isFinished = true;
-                if (result.ThingPackExecutions.Where(p => p.ThingPack.idThingPack == res.ThingPack.idThingPack).FirstOrDefault().ThingExecutions.Where(p => p.isFinished == false).Count() == 0)
-                {
-                    result.ThingPackExecutions.Where(p => p.ThingPack.idThingPack == res.ThingPack.idThingPack).FirstOrDefault().isCompleted = true;
-                }
-                context.SaveChanges();
-                return Ok("Покупка завершена");
-            }
-            else
-            {
-                return BadRequest("Недостаточно поинтов для покупки данного предмета.");
-            }
-
-        }
 
         [HttpPost]
         [Route("sendAppeal")]
         public async Task<ActionResult> sendAppeal(PostModels.SendAppealModel model)
         {
-            var child = context.Children.Where(p => p.Id == model.ChildId).FirstOrDefault();
+            var child = context.Children.FirstOrDefault(p => p.Id == model.ChildId);
             if (child == null)
             {
                 return BadRequest("Данного пользователя не существует");
             }
-            var type = context.TypeAppeals.Where(p => p.typeName == model.type).FirstOrDefault();
+            var type = context.TypeAppeals.FirstOrDefault(p => p.typeName == model.type);
             if (type == null)
             {
                 return BadRequest("Данного типа обращения не существует");
             }
-            child.Appeals.Add(new Models.Appeal { dateAppeal = DateTime.Now, status = Models.Status.InProcessing, TypeAppeal = type, textAppeal = model.textAppeal });
+            child.Appeals.Add(new Models.Appeal
+            {
+                dateAppeal = DateTime.Now,
+                status = Models.Status.InProcessing,
+                TypeAppeal = type,
+                textAppeal = model.textAppeal
+            });
             context.SaveChanges();
             return Ok("Успешно");
         }
+
         [HttpPost]
         [Route("deleteAppeal")]
         public async Task<ActionResult> deleteAppeal(List<PostModels.DeleteAppealModel> model)
         {
-            var child = context.Children.Where(p => p.Id == model.FirstOrDefault().ChildId).FirstOrDefault();
+            var child = await context.Children.FirstOrDefaultAsync(p => p.Id == model.FirstOrDefault().ChildId);
             if (child == null)
             {
                 return BadRequest("Данного пользователя не существует");
@@ -415,11 +424,12 @@ namespace webApiipAweb.Controllers
             context.SaveChanges();
             return Ok("Успешно");
         }
+
         [HttpPost]
         [Route("archiveAppeal")]
         public async Task<ActionResult> archiveAppeal(List<PostModels.DeleteAppealModel> model)
         {
-            var child = context.Children.Where(p => p.Id == model.FirstOrDefault().ChildId).FirstOrDefault();
+            var child = await context.Children.FirstOrDefaultAsync(p => p.Id == model.FirstOrDefault().ChildId);
             if (child == null)
             {
                 return BadRequest("Данного пользователя не существует");
@@ -428,7 +438,7 @@ namespace webApiipAweb.Controllers
             {
                 try
                 {
-                    child.Appeals.Where(p => p.idAppeal == mod.idAppeal).FirstOrDefault().inArchive = true;
+                    child.Appeals.FirstOrDefault(p => p.idAppeal == mod.idAppeal).inArchive = true;
                 }
                 catch
                 {
@@ -443,23 +453,26 @@ namespace webApiipAweb.Controllers
         [Route("GetAppeals")]
         public async Task<ActionResult> GetAppeals(GetAppealModel model)
         {
-            var appealsSelectedChild = context.Appeals.Where(p => p.ChildId == model.idChild).Select(p => new
-            {
-                idAppeal = p.idAppeal,
-                textAppeal = p.textAppeal,
-                dateAppeal = p.dateAppeal.ToString("HH.mm dd.MM.yyyy"),
-                type = p.TypeAppeal.typeName,
-                status = p.GetStatus(),
-                inArchive = p.inArchive
-            }).ToList();
-            return Ok(appealsSelectedChild == null ? "У вас нет обращений." : appealsSelectedChild);
+            var appealsSelectedChild = await context.Appeals.Where(p => p.ChildId == model.idChild)
+                .Select(p => new
+                {
+                    idAppeal = p.idAppeal,
+                    textAppeal = p.textAppeal,
+                    dateAppeal = p.dateAppeal.ToString("HH.mm dd.MM.yyyy"),
+                    type = p.TypeAppeal.typeName,
+                    status = p.GetStatus(),
+                    inArchive = p.inArchive
+                }).ToListAsync();
+            return Ok(appealsSelectedChild ==null
+                ? "У вас нет обращений."
+                : appealsSelectedChild);
         }
 
         [HttpPost]
         [Route("GetChapterResult")]
         public async Task<ActionResult> GetChapterResult(PostResultChapetModel model)
         {
-            var chapter = context.ChapterExecutions.Where(p => p.idChapterExecution == model.idChapterExecution).FirstOrDefault();
+            var chapter = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == model.idChapterExecution);
             if (chapter == null)
             {
                 return BadRequest("Такого выполнения раздела не существует.");
@@ -528,6 +541,8 @@ namespace webApiipAweb.Controllers
         public int levelStuding { get; set; }
         public string lastName { get; set; }
         public string firstName { get; set; }
+        public string levelWord { get; set; }
+        public string idSchool { get; set; }
     }
     public class ChangePasswordModel
     {

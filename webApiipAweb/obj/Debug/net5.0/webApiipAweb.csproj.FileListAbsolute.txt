@@ -864,3 +864,16 @@ C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\Irony.d
 C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\SixLabors.Fonts.dll
 C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\System.IO.Packaging.dll
 C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\XLParser.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\webApiipAweb.StaticWebAssets.xml
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\ClosedXML.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\DocumentFormat.OpenXml.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\ExcelNumberFormat.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\Irony.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\Microsoft.AspNetCore.Identity.UI.Views.V4.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\Microsoft.AspNetCore.Identity.UI.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\Microsoft.Extensions.FileProviders.Embedded.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\SixLabors.Fonts.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\System.IO.Packaging.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\XLParser.dll
+C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\obj\Debug\net5.0\webApiipAweb.MvcApplicationPartsAssemblyInfo.cs

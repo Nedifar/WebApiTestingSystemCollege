@@ -73,7 +73,7 @@ namespace webApiipAweb.Controllers
                         }
                         writer.Write(1, schoolCount.ToString(), school.nameSchool); //???
 
-                        var usersGroupLevel = sortedUsers.GroupBy(p => p.levelStuding);
+                        var usersGroupLevel = sortedUsers.GroupBy(p => p.levelStuding + p.levelWord);
 
                         foreach (var level in usersGroupLevel)
                         {
