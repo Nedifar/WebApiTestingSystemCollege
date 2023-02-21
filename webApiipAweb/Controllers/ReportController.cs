@@ -82,7 +82,7 @@ namespace webApiipAweb.Controllers
 
 
                             var chaptersInSubject = await context.Chapters.Where(p => p.Subject.nameSubject == subject
-                                && p.Subject.LevelStuding.nameLevel == level.Key.ToString())
+                                && p.Subject.LevelStuding.nameLevel == level.FirstOrDefault().levelStuding.ToString())
                                     .ToListAsync();
 
                             foreach (var chapter in chaptersInSubject)

@@ -123,16 +123,16 @@ namespace webApiipAweb.Controllers
                         });
                     }
                 }
-                return BadRequest("Неправильный логин email или пароль");
+                return Ok("Неправильный логин email или пароль");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Ok(ex.Message);
             }
         }
 
         [HttpPost]
-        [Authorize(Roles ="admin")]
+        [Authorize (AuthenticationSchemes = "Bearer", Roles ="admin")]
         [Route("adminReg")]
         public async Task<ActionResult> AdminRegistration(RegPost model)
         {
