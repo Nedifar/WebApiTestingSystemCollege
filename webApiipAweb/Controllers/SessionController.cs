@@ -122,7 +122,7 @@ namespace webApiipAweb.Controllers
         [Route("getSessionOfChild")]
         public async Task<ActionResult> GetSessionOfChild([FromQuery] string idChild, [FromQuery] string idChapter)
         {
-            await BeforeSessionResponse();
+            await BeforeSessionResponse(context);
             var child = await context.Children.FirstOrDefaultAsync(p => p.Id == idChild);
             var currentChapterSessions = child?.SessionChapterExecutions.Where(p => p.ChapterExecution.idChapter == idChapter);
             var currentChapterExecution = currentChapterSessions?.FirstOrDefault()?.ChapterExecution;
@@ -375,7 +375,7 @@ namespace webApiipAweb.Controllers
             }));
         }
 
-        private async Task BeforeSessionResponse()
+        public static async Task BeforeSessionResponse(context context)
         {
             var sessions = await context.SessionChapterExecutions.ToListAsync();
             foreach (var session in sessions.Where(p => p.activeSession))

@@ -26,120 +26,138 @@ namespace webApiipAweb.Controllers
         [HttpGet]
         public async Task<ActionResult> FullReportGenerate([FromQuery] string areaName, [FromQuery] string[] classes, string subject)
         {
+            await SessionController.BeforeSessionResponse(context);
+
             if (subject == null)
             {
                 return BadRequest("Укажите предмет");
             }
 
-            XLWorkbook workbook = new();
-            workbook.Worksheets.Add("Основной");
-            var worksheet = workbook.Worksheets.Worksheet("Основной");
-            var writer = new WorksheetWriter(worksheet);
-            var municipalities = await context.Municipalities.Where(p => p.Area.areaName == areaName)
-                .ToListAsync();
-
-            int municipalityCount = 1;
-
-            foreach (var municipality in municipalities)
+            await Task.Run(async () =>
             {
-                if (municipality.Schools.FirstOrDefault(p => p.Users.Any()) is School)
+                XLWorkbook workbook = new();
+                workbook.Worksheets.Add("Основной");
+                var worksheet = workbook.Worksheets.Worksheet("Основной");
+                var writer = new WorksheetWriter(worksheet);
+                var municipalities = await context.Municipalities.Where(p => p.Area.areaName == areaName)
+                    .ToListAsync();
+
+                int municipalityCount = 1;
+
+                foreach (var municipality in municipalities)
                 {
-                    writer.Write(1, municipalityCount.ToString(), municipality.name); //???
-
-                    int schoolCount = 1;
-                    foreach (var school in municipality.Schools)
+                    if (municipality.Schools.FirstOrDefault(p => p.Users.Any()) is School)
                     {
+                        writer.Write(1, municipalityCount.ToString(), municipality.name); //???
 
-                        var filtredUsers = classes == null
-                            ? school.Users
-                            : school.Users.Where(p =>
-                            {
-                                return classes.Contains(p.levelStuding.ToString());
-                            });
-
-                        filtredUsers = filtredUsers.Where(p => p.LevelStudingExecutions
-                            .FirstOrDefault(p => p.SubjectExecutions
-                            .FirstOrDefault(p => p.Subject.nameSubject == subject)
-                            is SubjectExecution)
-                            is LevelStudingExecution);
-
-                        var sortedUsers = filtredUsers.OrderBy(p => p.levelStuding)
-                            .ThenBy(p => p.UserName)
-                            .ToList();
-
-                        if (!sortedUsers.Any())
+                        int schoolCount = 1;
+                        foreach (var school in municipality.Schools)
                         {
-                            continue;
-                        }
-                        writer.Write(1, schoolCount.ToString(), school.nameSchool); //???
 
-                        var usersGroupLevel = sortedUsers.GroupBy(p => p.levelStuding + p.levelWord);
-
-                        foreach (var level in usersGroupLevel)
-                        {
-                            writer.Write(2, level.Key.ToString());
-
-
-
-                            var chaptersInSubject = await context.Chapters.Where(p => p.Subject.nameSubject == subject
-                                && p.Subject.LevelStuding.nameLevel == level.FirstOrDefault().levelStuding.ToString())
-                                    .ToListAsync();
-
-                            foreach (var chapter in chaptersInSubject)
-                            {
-                                writer.Write(2, chapter.name);
-                                foreach (var user in level)
+                            var filtredUsers = classes == null
+                                ? school.Users
+                                : school.Users.Where(p =>
                                 {
-                                    var sessionsFiltred = user.SessionChapterExecutions.Where(p => p.ChapterExecution.Chapter.name == chapter.name).ToList();
-                                    List<string> arraySessions = new();
-                                    var sessionSorted = sessionsFiltred.OrderByDescending(p => p.beginDateTime)
-                                        .FirstOrDefault()?.SessionProgresses
-                                        .OrderBy(p => p.taskNumber)
-                                        .ToList();
-                                    if (sessionSorted == null)
-                                        continue;
-                                    sessionSorted.ForEach(sessionProgress =>
-                                {
-                                    arraySessions.Add(sessionProgress.GetStatus() == "Ожидает выполнения"
-                                        ? "Решено неверно"
-                                        : sessionProgress.GetStatus());
+                                    return classes.Contains(p.levelStuding.ToString());
                                 });
-                                    writer.RowDown();
-                                    writer.Write(3, user.lastName);
-                                    writer.RowUp();
-                                    writer.Write(4, arraySessions.ToArray());
 
-                                    arraySessions.Clear();
+                            filtredUsers = filtredUsers.Where(p => p.LevelStudingExecutions
+                                .FirstOrDefault(p => p.SubjectExecutions
+                                .FirstOrDefault(p => p.Subject.nameSubject == subject)
+                                is SubjectExecution)
+                                is LevelStudingExecution);
 
-                                    foreach (var session in sessionsFiltred.OrderByDescending(p => p.beginDateTime))
+                            var sortedUsers = filtredUsers.OrderBy(p => p.levelStuding)
+                                .ThenBy(p => p.UserName)
+                                .ToList();
+
+                            if (!sortedUsers.Any())
+                            {
+                                continue;
+                            }
+                            writer.Write(1, schoolCount.ToString(), school.nameSchool); //???
+
+                            var usersGroupLevel = sortedUsers.GroupBy(p => p.levelStuding + p.levelWord);
+
+                            foreach (var level in usersGroupLevel)
+                            {
+                                writer.Write(2, level.Key.ToString());
+
+                                var chaptersInSubject = await context.Chapters.Where(p => p.Subject.nameSubject == subject
+                                    && p.Subject.LevelStuding.nameLevel == level.FirstOrDefault().levelStuding.ToString())
+                                        .ToListAsync();
+
+                                foreach (var chapter in chaptersInSubject)
+                                {
+                                    if (level.Any(p => p.SessionChapterExecutions
+                                    .Any(s => s.ChapterExecution.Chapter.name == chapter.name)))
                                     {
-                                        session.SessionProgresses.OrderBy(p => p.taskNumber).ToList().ForEach(item =>
+                                        writer.Write(2, chapter.name);
+                                        foreach (var user in level.OrderBy(p => p.lastName))
                                         {
-                                            arraySessions.Add(item.GetStatus());
+                                            var sessionsFiltred = user.SessionChapterExecutions.Where(p => p.ChapterExecution.Chapter.name == chapter.name).ToList();
+                                            List<string> arraySessions = new();
+                                            var sessionSorted = sessionsFiltred.OrderByDescending(p => p.beginDateTime)
+                                                .FirstOrDefault()?.SessionProgresses
+                                                .OrderBy(p => p.taskNumber)
+                                                .ToList();
+                                            if (sessionSorted == null)
+                                                continue;
+                                            sessionSorted.ForEach(sessionProgress =>
+                                        {
+                                            arraySessions.Add(sessionProgress.GetStatus() == "Ожидает выполнения"
+                                                ? "Решено неверно"
+                                                : sessionProgress.GetStatus());
                                         });
+                                            writer.RowDown();
+                                            writer.Write(3, user.lastName);
+                                            writer.RowUp();
+                                            writer.Write(4, arraySessions.ToArray());
 
-                                        var timeExecution = ((session.endDateTime ?? DateTime.UtcNow.AddHours(5)) - session.beginDateTime).Value.ToString().Split('.')[0];
+                                            arraySessions.Clear();
 
-                                        writer.Write(4, arraySessions.ToArray());
-                                        writer.RowUp();
-                                        writer.Write(arraySessions.Count + 4, session.beginDateTime,
-                                            session.endDateTime, timeExecution);
-                                        arraySessions.Clear();
+                                            foreach (var session in sessionsFiltred.OrderByDescending(p => p.beginDateTime))
+                                            {
+                                                session.SessionProgresses.OrderBy(p => p.taskNumber).ToList().ForEach(item =>
+                                                {
+                                                    arraySessions.Add(item.GetStatus());
+                                                });
+
+                                                var timeExecution = ((session.endDateTime ?? DateTime.UtcNow.AddHours(5)) - session.beginDateTime).Value.ToString().Split('.')[0];
+
+                                                writer.Write(4, arraySessions.ToArray());
+                                                writer.RowUp();
+                                                writer.Write(arraySessions.Count + 4, session.beginDateTime,
+                                                    session.endDateTime, timeExecution);
+                                                arraySessions.Clear();
+                                            }
+                                            writer.RowDown();
+                                        }
                                     }
-                                    writer.RowDown();
                                 }
                             }
                         }
                     }
+                    else
+                    {
+                        continue;
+                    }
+                    municipalityCount++;
                 }
-                else
-                {
-                    continue;
-                }
-                municipalityCount++;
+                workbook.SaveAs("main.xlsx");
             }
-            workbook.SaveAs("main.xlsx");
-            return Ok();
+            );
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = "main.xlsx"
+            };
+            return File(AppContext.BaseDirectory + "main.xlsx", "application/xlsx", "");
+        }
+
+        private ActionResult DownloadFile(string path)
+        {
+            byte[] filedata = System.IO.File.ReadAllBytes(path);
+            string contentType = MimeMapping.GetMimeMapping(path);
         }
     }
 
@@ -170,11 +188,20 @@ namespace webApiipAweb.Controllers
                     {
                         xL.Cell(selectedRow, column).Style.Fill.BackgroundColor = cellValue.ToString() switch
                         {
-                            "Ожидает выполнения" => XLColor.Orange,
+                            "Ожидает выполнения" => XLColor.Gray,
                             "Решено неверно" => XLColor.Red,
                             "Решено верно" => XLColor.Green,
                             _ => XLColor.Transparent
                         };
+                        xL.Cell(selectedRow, column).Value = cellValue.ToString() switch
+                        {
+                            "Ожидает выполнения" => -1,
+                            "Решено неверно" => 0,
+                            "Решено верно" => 1,
+                            _ => ""
+                        };
+                        xL.Cell(selectedRow, column).WorksheetColumn().Width = 3;
+
                         xL.Cell(selectedRow, column).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                         xL.Cell(selectedRow, column).Style.Border.TopBorder = XLBorderStyleValues.Thin;
                         xL.Cell(selectedRow, column).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
