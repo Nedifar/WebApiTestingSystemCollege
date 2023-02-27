@@ -6,6 +6,10 @@ C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\webApiipAweb.runtimeconfig.json
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\webApiipAweb.pdb
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\Castle.Core.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\ClosedXML.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\DocumentFormat.OpenXml.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\ExcelNumberFormat.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\Irony.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\MailKit.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\System.Net.Http.Formatting.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
@@ -38,11 +42,14 @@ C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\Npgsql.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\BouncyCastle.Crypto.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\SixLabors.Fonts.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\System.Configuration.ConfigurationManager.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\System.Diagnostics.DiagnosticSource.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\System.IO.Packaging.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\System.Runtime.Caching.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\System.Security.Cryptography.ProtectedData.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\XLParser.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\PubTmp\Out\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
