@@ -26,10 +26,12 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpGet]
-        //[Authorize(AuthenticationSchemes ="Bearer", Roles ="su")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles ="su")]
         [Route("fullTaskReport")]
         public async Task<ActionResult> FullReportGenerate([FromQuery] string areaName, [FromQuery] string[] classes, string subject)
         {
+            var request = Request;
+            var response = Response;
             await SessionController.BeforeSessionResponse(context);
 
             if (subject == null)

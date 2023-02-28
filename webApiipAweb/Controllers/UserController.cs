@@ -3,23 +3,20 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Security.Claims;
-using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
-using webApiipAweb.Auth;
 using webApiipAweb.Email;
 using webApiipAweb.Models;
+using webApiipAweb.PostModels;
 
 namespace webApiipAweb.Controllers
 {
@@ -31,12 +28,15 @@ namespace webApiipAweb.Controllers
         private Models.context context;
         private readonly UserManager<Models.Child> _userManager;
         private readonly SignInManager<Models.Child> _signInManager;
-        public UserController(Models.context _context, UserManager<Models.Child> userManager, SignInManager<Models.Child> signInManager, IWebHostEnvironment appEnvironment)
+        private readonly IConfiguration _configuration;
+
+        public UserController(Models.context _context, UserManager<Models.Child> userManager, SignInManager<Models.Child> signInManager, IWebHostEnvironment appEnvironment, IConfiguration configuration)
         {
             _appEnvironment = appEnvironment;
             _userManager = userManager;
             _signInManager = signInManager;
             context = _context;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -51,18 +51,21 @@ namespace webApiipAweb.Controllers
                     return BadRequest(new { errorText = "Invalid username or password." });
                 var now = DateTime.UtcNow;
                 var jwt = new JwtSecurityToken(
-                issuer: AuthOptions.ISSUER,
-                audience: AuthOptions.AUDIENCE,
-                notBefore: now,
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
                 claims: identity,
-                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                expires: now.AddMinutes(int.Parse(_configuration["JWT:TokenValidityInMinutes"])),
+                signingCredentials: new SigningCredentials(Token.Token.GetSymmetricSecurityKey(_configuration), SecurityAlgorithms.HmacSha256));
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
+                child.refreshToken = Token.Token.GenerateRefreshToken();
+                child.refreshTokenExpiryTime = DateTime.Now.AddDays(int.Parse(_configuration["JWT:RefreshTokenValidityInDays"]));
+                context.SaveChanges();
                 var response = new
                 {
-                    access_token = encodedJwt,
+                    refreshToken = child.refreshToken,
+                    accessToken = encodedJwt,
                     id = identity.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value,
+                    expiration = jwt.ValidTo
                 };
                 return new JsonResult(response);
             }
@@ -70,6 +73,92 @@ namespace webApiipAweb.Controllers
             {
                 return BadRequest(@"-\_/-");
             }
+        }
+
+        [Authorize(AuthenticationSchemes = "Roles", Roles = "su")]
+        [HttpPost]
+        [Route("revoke/{id}")]
+        public async Task<IActionResult> Revoke(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return BadRequest("Invalid id");
+
+            user.refreshToken = null;
+            await _userManager.UpdateAsync(user);
+
+            return NoContent();
+        }
+
+        [Authorize(AuthenticationSchemes = "Roles", Roles = "su")]
+        [HttpPost]
+        [Route("revokeAll")]
+        public async Task<IActionResult> RevokeAll()
+        {
+            var users = _userManager.Users.ToList();
+            foreach (var user in users)
+            {
+                user.refreshToken = null;
+                await _userManager.UpdateAsync(user);
+            }
+            return NoContent();
+        }
+
+        [HttpPost]
+        [Route("refreshToken")]
+        public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
+        {
+            if (tokenModel is null)
+            {
+                return BadRequest("Invalid client request");
+            }
+
+            string accessToken = tokenModel.accessToken;
+            string refreshToken = tokenModel.refreshToken;
+
+            var principal = GetPrincipalFromExpiredToken(accessToken);
+            if (principal == null)
+            {
+                return BadRequest("Invalid access token or refresh token");
+            }
+            string username = principal.Claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+
+            var user = await _userManager.FindByIdAsync(username);
+
+            if (user == null || user.refreshToken != refreshToken || user.refreshTokenExpiryTime <= DateTime.Now)
+            {
+                return BadRequest("Invalid access token or refresh token");
+            }
+
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+
+                };
+            foreach (var role in await _userManager.GetRolesAsync(user))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+            issuer: _configuration["JWT:Issuer"],
+            audience: _configuration["JWT:Audience"],
+            notBefore: now,
+            claims: claims,
+            expires: now.Add(TimeSpan.FromMinutes(int.Parse(_configuration["JWT:TokenValidityInMinutes"]))),
+            signingCredentials: new SigningCredentials(Token.Token.GetSymmetricSecurityKey(_configuration), SecurityAlgorithms.HmacSha256));
+
+            var newAccessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var newRefreshToken = Token.Token.GenerateRefreshToken();
+
+            user.refreshToken = newRefreshToken;
+            await _userManager.UpdateAsync(user);
+
+            return new ObjectResult(new
+            {
+                accessToken = newAccessToken,
+                refreshToken = newRefreshToken
+            });
         }
 
         [HttpPost]
@@ -132,7 +221,7 @@ namespace webApiipAweb.Controllers
         }
 
         [HttpPost]
-        [Authorize (AuthenticationSchemes = "Bearer", Roles ="admin")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "su")]
         [Route("adminReg")]
         public async Task<ActionResult> AdminRegistration(RegPost model)
         {
@@ -152,7 +241,7 @@ namespace webApiipAweb.Controllers
                     firstName = model.firstName,
                     EmailConfirmed = true,
                     levelWord = model.levelWord,
-                    School = context.Schools.FirstOrDefault(p=>p.idSchool == model.idSchool)
+                    School = context.Schools.FirstOrDefault(p => p.idSchool == model.idSchool)
                 };
                 ch.UserName = ch.Id;
 
@@ -186,7 +275,7 @@ namespace webApiipAweb.Controllers
         [HttpPost]
         [Route("reg")]
         public async Task<ActionResult> Registration(RegPost model)
-        { 
+        {
             var ch = new Child();
             try
             {
@@ -220,7 +309,7 @@ namespace webApiipAweb.Controllers
                         protocol: HttpContext.Request.Scheme);
                     callbackUrl = callbackUrl.Replace("http://localhost:5000", "https://gamification.oksei.ru/gameserv");
                     callbackUrl = callbackUrl.Replace("192.168.147.72:81", "gamification.oksei.ru");
-                    EmailService emailService = new ();
+                    EmailService emailService = new();
                     await emailService.SendEmailAsync(ch.Email, "Confirm your account",
                         $"Пожалуйста, подтвердите почту по ссылке: <a href='{callbackUrl}'>ссылка</a>");
 
@@ -380,7 +469,7 @@ namespace webApiipAweb.Controllers
         [Route("sendAppeal")]
         public async Task<ActionResult> sendAppeal(PostModels.SendAppealModel model)
         {
-            var child = context.Children.FirstOrDefault(p => p.Id == model.ChildId);
+            var child = await context.Children.FirstOrDefaultAsync(p => p.Id == model.ChildId);
             if (child == null)
             {
                 return BadRequest("Данного пользователя не существует");
@@ -390,7 +479,7 @@ namespace webApiipAweb.Controllers
             {
                 return BadRequest("Данного типа обращения не существует");
             }
-            child.Appeals.Add(new Models.Appeal
+            child.Appeals.Add(new Appeal
             {
                 dateAppeal = DateTime.Now,
                 status = Models.Status.InProcessing,
@@ -463,7 +552,7 @@ namespace webApiipAweb.Controllers
                     status = p.GetStatus(),
                     inArchive = p.inArchive
                 }).ToListAsync();
-            return Ok(appealsSelectedChild ==null
+            return Ok(appealsSelectedChild == null
                 ? "У вас нет обращений."
                 : appealsSelectedChild);
         }
@@ -472,7 +561,7 @@ namespace webApiipAweb.Controllers
         [Route("GetChapterResult")]
         public async Task<ActionResult> GetChapterResult(PostResultChapetModel model)
         {
-            var chapter = context.ChapterExecutions.FirstOrDefault(p => p.idChapterExecution == model.idChapterExecution);
+            var chapter = await context.ChapterExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == model.idChapterExecution);
             if (chapter == null)
             {
                 return BadRequest("Такого выполнения раздела не существует.");
@@ -524,6 +613,26 @@ namespace webApiipAweb.Controllers
             {
                 return null;
             }
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:KEY"])),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+
         }
     }
 

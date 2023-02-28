@@ -5,21 +5,26 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using webApiipAweb.Auth;
 using webApiipAweb.Models;
 
 namespace webApiipAweb
 {
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public IConfiguration Configuration { get; set; }
+
+        public Startup(IConfiguration config)
+        {
+            Configuration = config;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
             string con = @"Server=192.168.147.72\sqlexpress;User id=sa; pwd=ArbiDOL2+0;Database=GamificationBase;";
@@ -28,23 +33,24 @@ namespace webApiipAweb
     .AddJwtBearer(options =>
     {
         options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = AuthOptions.ISSUER,
+            ValidIssuer = Configuration["JWT:Issuer"],
             ValidateAudience = true,
-            ValidAudience = AuthOptions.AUDIENCE,
+            ValidAudience = Configuration["JWT:Audience"],
             ValidateLifetime = true,
-            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = Token.Token.GetSymmetricSecurityKey(Configuration),
             ValidateIssuerSigningKey = true,
         };
     });
-            services.AddIdentity<Models.Child, ApplicationRole>()
-                .AddEntityFrameworkStores<Models.context>()
+            services.AddIdentity<Child, ApplicationRole>()
+                .AddEntityFrameworkStores<context>()
                 .AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>
             {
-                // Default Password settings.
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = false;

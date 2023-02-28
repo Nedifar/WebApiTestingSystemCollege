@@ -26,6 +26,10 @@ namespace webApiipAweb.Models
 
         public string imagePath { get; set; }
 
+        public string refreshToken { get; set; }
+
+        public DateTime? refreshTokenExpiryTime { get; set; }
+
         public string getRelevantPathImage
         {
             get

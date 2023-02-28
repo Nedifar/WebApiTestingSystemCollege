@@ -10,8 +10,8 @@ using webApiipAweb.Models;
 namespace webApiipAweb.Migrations
 {
     [DbContext(typeof(context))]
-    [Migration("20230216100728_updateFromDB")]
-    partial class updateFromDB
+    [Migration("20230228071824_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -435,11 +435,20 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("levelStuding")
                         .HasColumnType("int");
 
+                    b.Property<string>("levelWord")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("passRecoveryCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("point")
                         .HasColumnType("float");
+
+                    b.Property<string>("refreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("refreshTokenExpiryTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<double>("spendPoint")
                         .HasColumnType("float");
@@ -670,12 +679,6 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("dateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("header")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("idTestPack")
                         .HasColumnType("nvarchar(450)");
 
@@ -746,14 +749,8 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("dateCreated")
-                        .HasColumnType("datetime2");
-
                     b.Property<double>("fine")
                         .HasColumnType("float");
-
-                    b.Property<string>("header")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("htmlModel")
                         .HasColumnType("nvarchar(max)");

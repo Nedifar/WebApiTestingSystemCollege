@@ -433,11 +433,20 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("levelStuding")
                         .HasColumnType("int");
 
+                    b.Property<string>("levelWord")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("passRecoveryCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("point")
                         .HasColumnType("float");
+
+                    b.Property<string>("refreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("refreshTokenExpiryTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<double>("spendPoint")
                         .HasColumnType("float");
@@ -668,12 +677,6 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("dateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("header")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("idTestPack")
                         .HasColumnType("nvarchar(450)");
 
@@ -744,14 +747,8 @@ namespace webApiipAweb.Migrations
                     b.Property<int>("TypesTask")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("dateCreated")
-                        .HasColumnType("datetime2");
-
                     b.Property<double>("fine")
                         .HasColumnType("float");
-
-                    b.Property<string>("header")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("htmlModel")
                         .HasColumnType("nvarchar(max)");
