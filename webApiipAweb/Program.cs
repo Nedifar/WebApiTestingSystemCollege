@@ -21,6 +21,7 @@ namespace webApiipAweb
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseWebRoot("files");
                 });
     }
 }
