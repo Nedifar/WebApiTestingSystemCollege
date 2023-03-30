@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,17 +46,20 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if (context.LevelStudings.Where(p => p.nameLevel == model.levelStuding.ToString()).FirstOrDefault() == null)
+                var currentLevel = context.LevelStudings.FirstOrDefault(p => p.nameLevel == model.levelStuding.ToString());
+                if (currentLevel == null)
                 {
                     return BadRequest("Данного класса не существует.");
                 }
-                if (context.Subjects.Where(p => p.LevelStuding.nameLevel == model.levelStuding.ToString() && p.nameSubject == model.name).FirstOrDefault() != null)
+                if (context.Subjects.FirstOrDefault(p => p.LevelStuding.nameLevel == model.levelStuding.ToString() && p.nameSubject == model.name) != null)
                 {
                     return BadRequest("Данная десциплина уже добавлена.");
                 }
-                context.Subjects.Add(new Models.Subject { LevelStuding = context.LevelStudings.Where(p => p.nameLevel == model.levelStuding.ToString()).FirstOrDefault(), nameSubject = model.name });
+                
+                context.Subjects.Add(new Models.Subject { LevelStuding = currentLevel, nameSubject = model.name });
                 context.SaveChanges();
-                return Ok("Объект успешно создан.");
+                return Ok("Объект успешно создан.\n"
+                    + context.Subjects.FirstOrDefault(p => p.idLevelStuding == currentLevel.idLevelStuding && p.nameSubject == model.name).idSubject);
             }
             catch (Exception ex)
             {
@@ -90,18 +94,25 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if (context.Subjects.Where(p => p.LevelStuding.nameLevel == model.levelStuding && p.nameSubject == model.nameSubject).FirstOrDefault() == null)
+                if (context.Subjects.FirstOrDefault(p => p.LevelStuding.nameLevel == model.levelStuding && p.nameSubject == model.nameSubject) == null)
                 {
                     return BadRequest("Данного класса или предмета не существует.");
                 }
-                var selected = context.Subjects.Where(p => p.LevelStuding.nameLevel == model.levelStuding && p.nameSubject == model.nameSubject).FirstOrDefault();
+                var selected = context.Subjects.FirstOrDefault(p => p.LevelStuding.nameLevel == model.levelStuding && p.nameSubject == model.nameSubject);
                 if (selected.Chapters.Where(p => p.name == model.name).FirstOrDefault() != null)
                 {
                     return BadRequest("Данный раздел уже добавлен.");
                 }
-                selected.Chapters.Add(new Models.Chapter { Description = model.Description, name = model.name, access = model.access });
+                var newChapter = new Models.Chapter
+                {
+                    Description = model.Description,
+                    name = model.name,
+                    access = model.access
+                };
+                selected.Chapters.Add(newChapter);
                 await context.SaveChangesAsync();
-                return Ok("Объект успешно создан.");
+                return Ok("Объект успешно создан.\n"
+                    + newChapter.idChapter);
             }
             catch (Exception ex)
             {
@@ -120,16 +131,19 @@ namespace webApiipAweb.Controllers
                 {
                     return BadRequest("Данного класса, предмета не существует.");
                 }
+
                 var selected = context.Subjects.Where(p => p.LevelStuding.nameLevel == teoM.levelStuding && p.nameSubject == teoM.nameSubject).FirstOrDefault();
                 if (selected.Chapters.Where(p => p.name == teoM.chapterName).FirstOrDefault() == null)
                 {
                     return BadRequest("Данного раздела не существует.");
                 }
+
                 var selectedChapter = selected.Chapters.Where(p => p.name == teoM.chapterName).FirstOrDefault();
                 if (selectedChapter.TheoreticalMaterials.Where(p => p.header == teoM.header).FirstOrDefault() != null)
                 {
                     return BadRequest("Теоретический материал с данным заголовком уже существует.");
                 }
+
                 selectedChapter.TheoreticalMaterials.Add(new Models.TheoreticalMaterial { content = teoM.content, header = teoM.header });
                 await context.SaveChangesAsync();
                 return Ok("Объект успешно создан.");
@@ -184,18 +198,27 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if (context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault() == null)
+                if (context.Chapters.FirstOrDefault(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName) == null)
                 {
                     return BadRequest("Данного класса, предмета или раздела не существует.");
                 }
-                var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName && p.name == model.chapterName).FirstOrDefault();
+                var selected = context.Chapters.FirstOrDefault(p => p.Subject.LevelStuding.nameLevel == model.levelStuding
+                && p.Subject.nameSubject == model.subjectName
+                && p.name == model.chapterName);
+
                 if (selected.TestPacks.Where(p => p.header == model.header).FirstOrDefault() != null)
                 {
                     return BadRequest("Данная тестовая коллекция уже существует.");
                 }
-                selected.TestPacks.Add(new Models.TestPack { header = model.header, Type = model.Type });
-                context.SaveChanges();
-                return Ok("Объект успешно создан.");
+                var newTestPack = new Models.TestPack
+                {
+                    header = model.header,
+                    Type = model.Type
+                };
+
+                selected.TestPacks.Add(newTestPack);
+                await context.SaveChangesAsync();
+                return Ok("Объект успешно создан.\n" + newTestPack.idTestPack);
             }
             catch (Exception ex)
             {
@@ -209,21 +232,22 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                if (context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault() == null)
+                var selected = await context.Chapters.FirstOrDefaultAsync(p => p.Subject.LevelStuding.nameLevel == model.levelStuding
+                && p.Subject.nameSubject == model.subjectName);
+                if (selected == null)
                 {
                     return BadRequest("Данного класса, предмета или раздела не существует.");
                 }
-                var selected = context.Chapters.Where(p => p.Subject.LevelStuding.nameLevel == model.levelStuding && p.Subject.nameSubject == model.subjectName).FirstOrDefault();
                 var testTask = new Models.TestTask { textQuestion = model.textQuestion };
                 foreach (var mod in model.CreatingAnswearOnTaskModels)
                 {
                     testTask.AnswearOnTasks.Add(new Models.AnswearOnTask { accuracy = mod.accuracy, textAnswear = mod.textAnswear });
                 }
-                if (selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault() == null)
+                if (selected.TestPacks.FirstOrDefault(p => p.header == model.testPackHeader) == null)
                 {
                     return BadRequest("Данной тестовой коллекции не существует.");
                 }
-                selected.TestPacks.Where(p => p.header == model.testPackHeader).FirstOrDefault().TestTasks.Add(testTask);
+                selected.TestPacks.FirstOrDefault(p => p.header == model.testPackHeader).TestTasks.Add(testTask);
                 context.SaveChanges();
                 return Ok("Объект успешно создан.");
             }
@@ -239,26 +263,21 @@ namespace webApiipAweb.Controllers
         {
             try
             {
-                var testPack = context.TestPacks.FirstOrDefault(p => p.idTestPack == model.idTestPack);
+                var testPack = await context.TestPacks.FirstOrDefaultAsync(p => p.idTestPack == model.idTestPack);
                 if (testPack == null)
                 {
                     return BadRequest("Данного кейса не существует");
                 }
 
-                var openTask = new Models.TaskWithOpenAnsw { 
-                    textQuestion = model.textQuestion, 
-                    theme = model.theme, 
+                var openTask = new Models.TaskWithOpenAnsw
+                {
+                    textQuestion = model.textQuestion,
+                    theme = model.theme,
                     isIncreasedComplexity = model.isIncreasedComplexity,
                     fine = model.fine,
                     orderImportant = model.orderImportant,
                     ResultType = model.resultType,
-                };
-
-                openTask.htmlModel = (model.resultType) switch //здесь 3 вариант не работает
-                {
-                    Models.ResultTypes.Label => "<input type=\"text\" class=\"task__input\">",
-                    Models.ResultTypes.Squares => "<div class=\"task__multiple-input\"> \r\n<input type=\"text\" class=\"task__input\"> \r\n<input type=\"text\" class=\"task__input\"> \r\n</div>\r\n",
-                    Models.ResultTypes.Table => "<div data-columns=\"5\" class=\"task__input-table\">\r\n              <div class=\"task__table-cell\">А</div>\r\n              <div class=\"task__table-cell\">Б</div>\r\n              <div class=\"task__table-cell\">В</div>\r\n              <div class=\"task__table-cell\">Г</div>\r\n              <div class=\"task__table-cell\">Д</div>\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n              <input type=\"text\" class=\"task__input task__table-cell\">\r\n            </div>\r\n"
+                    htmlModel = model.resultHTML
                 };
 
                 openTask.AnswearOnTaskOpens.Add(new Models.AnswearOnTaskOpen

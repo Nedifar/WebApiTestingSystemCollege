@@ -28,7 +28,10 @@ namespace webApiipAweb.Models
         {
             get
             {
-                return (int)ChapterExecutions.Average(p => p.getProcentChapter) + "%";
+                if (ChapterExecutions.Count != 0)
+                    return (int)ChapterExecutions.Average(p => p.getProcentChapter) + "%";
+                else
+                    return 0 + "%";
             }
         }
     }

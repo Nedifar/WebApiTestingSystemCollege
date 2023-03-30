@@ -177,31 +177,26 @@ namespace webApiipAweb.Controllers
                         //var userId = User.Claims.FirstOrDefault(p => p.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
                         //var child = context.Children.FirstOrDefault(p => p.Id == userId);
                         string imageUrl = String.Empty;
-                        using (var http = new HttpClient())
-                        {
-                            var request = await http.GetAsync($"http://192.168.147.72:83/api/userprofileimage?name={child.imagePath}");
-                            if (request.StatusCode == System.Net.HttpStatusCode.OK)
-                            {
-                                imageUrl = "http://192.168.147.72:83/" + $"img{child.Id}.jpeg";
-                            }
-                        }
+
+                        imageUrl = "http://192.168.147.55:81/" + $"img{child.Id}.jpeg";
+
                         return Ok(new
                         {
                             ChildId = child.Id,
-                            firstName = child.firstName,
-                            lastName = child.lastName,
+                            child.firstName,
+                            child.lastName,
                             email = child.Email,
-                            levelStuding = child.levelStuding,
-                            point = child.point,
-                            spendPoint = child.spendPoint,
+                            child.levelStuding,
+                            child.point,
+                            child.spendPoint,
 
                             Appeals = child.Appeals.Select(s => new
                             {
                                 date = s.dateAppeal,
-                                idAppeal = s.idAppeal,
-                                inArchive = s.inArchive,
+                                s.idAppeal,
+                                s.inArchive,
                                 status = s.status.ToString(),
-                                textAppeal = s.textAppeal,
+                                s.textAppeal,
                                 type = s.TypeAppeal.typeName
                             }),
                             image = imageUrl,
@@ -308,7 +303,7 @@ namespace webApiipAweb.Controllers
                         new { userId = ch.Id, code = code },
                         protocol: HttpContext.Request.Scheme);
                     callbackUrl = callbackUrl.Replace("http://localhost:5000", "https://gamification.oksei.ru/gameserv");
-                    callbackUrl = callbackUrl.Replace("192.168.147.72:81", "gamification.oksei.ru");
+                    callbackUrl = callbackUrl.Replace("192.168.147.55:81", "gamification.oksei.ru");
                     EmailService emailService = new();
                     await emailService.SendEmailAsync(ch.Email, "Confirm your account",
                         $"Пожалуйста, подтвердите почту по ссылке: <a href='{callbackUrl}'>ссылка</a>");

@@ -877,3 +877,12 @@ C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\SixLabor
 C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\System.IO.Packaging.dll
 C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\bin\Debug\net5.0\XLParser.dll
 C:\Users\Ilnaz\source\repos\webapiapitest\webApiipAweb\obj\Debug\net5.0\webApiipAweb.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\Sentry.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\Sentry.AspNetCore.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Debug\net5.0\Sentry.Extensions.Logging.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\Sentry.Attributes.cs
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\staticwebassets\webApiipAweb.StaticWebAssets.Pack.cache
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\staticwebassets\msbuild.webApiipAweb.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\staticwebassets\msbuild.build.webApiipAweb.props
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\staticwebassets\msbuild.buildMultiTargeting.webApiipAweb.props
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Debug\net5.0\staticwebassets\msbuild.buildTransitive.webApiipAweb.props

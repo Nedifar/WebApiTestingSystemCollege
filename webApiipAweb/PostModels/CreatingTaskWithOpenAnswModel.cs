@@ -26,6 +26,8 @@ namespace webApiipAweb.PostModels
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ResultTypes resultType { get; set; }
 
+        public string resultHTML { get; set; }
+
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ModeCreating mode { get; set; } = ModeCreating.End;
 

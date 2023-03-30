@@ -157,7 +157,7 @@ namespace webApiipAweb.Controllers
             {
                 var address = Response.HttpContext.Connection.RemoteIpAddress.ToString() == "192.168.102.108"
                     ? "https://gamification.oksei.ru/imagecontainer/"
-                    : "http://192.168.147.72:81/imagecontainer/";
+                    : "http://192.168.147.55:81/imagecontainer/";
                 var s = await context.TestPackExecutions.FirstOrDefaultAsync(p => p.idChapterExecution == model.idExecChapter && p.TestPack.header == model.headerTestPack);
                 var closed = s.TaskWithClosedAnswsExecutions.FirstOrDefault(p => p.TaskWithClosedAnsw.numericInPack == model.serialNumber);
                 var opened = s.TaskWithOpenAnswsExecutions.FirstOrDefault(p => p.TaskWithOpenAnsw.numericInPack == model.serialNumber);

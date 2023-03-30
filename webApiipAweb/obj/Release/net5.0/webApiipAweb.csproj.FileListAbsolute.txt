@@ -384,3 +384,12 @@ C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Irony.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\SixLabors.Fonts.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\System.IO.Packaging.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\XLParser.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\staticwebassets\webApiipAweb.StaticWebAssets.Pack.cache
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\staticwebassets\msbuild.webApiipAweb.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\staticwebassets\msbuild.build.webApiipAweb.props
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\staticwebassets\msbuild.buildMultiTargeting.webApiipAweb.props
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\staticwebassets\msbuild.buildTransitive.webApiipAweb.props
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.AspNetCore.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.Extensions.Logging.dll
+C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\Sentry.Attributes.cs

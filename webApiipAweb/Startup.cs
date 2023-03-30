@@ -27,7 +27,7 @@ namespace webApiipAweb
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string con = @"Server=192.168.147.72\sqlexpress;User id=sa; pwd=ArbiDOL2+0;Database=GamificationBase;";
+            string con = @"Server=192.168.147.55\sqlexpress;User id=sa; pwd=ArbiDOL2+0;Database=GamificationBase;";
             services.AddDbContext<Models.context>(options => options.UseSqlServer(con).UseLazyLoadingProxies());
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -75,6 +75,7 @@ namespace webApiipAweb
             });
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseSentryTracing();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors(x => x
