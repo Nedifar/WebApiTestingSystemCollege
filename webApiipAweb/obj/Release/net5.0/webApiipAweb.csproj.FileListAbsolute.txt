@@ -393,3 +393,11 @@ C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.AspNetCore.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.Extensions.Logging.dll
 C:\Users\SU\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\Sentry.Attributes.cs
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Microsoft.OpenApi.dll
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.dll
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.AspNetCore.dll
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Sentry.Extensions.Logging.dll
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\bin\Release\net5.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Nedifar\source\repos\webApiApiWeb\webApiipAweb\obj\Release\net5.0\Sentry.Attributes.cs

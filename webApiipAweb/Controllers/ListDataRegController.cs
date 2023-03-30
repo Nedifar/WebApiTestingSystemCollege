@@ -68,7 +68,7 @@ namespace webApiipAweb.Controllers
         [Route("getLevelsStuding")]
         public async Task<ActionResult> GetLevelsStuding()
         {
-            var levels = await context.LevelStudings.OrderBy(p=>Convert.ToInt32(p.nameLevel)).ToListAsync();
+            var levels = await context.LevelStudings.OrderBy(p => Convert.ToInt32(p.nameLevel)).ToListAsync();
             return Ok(levels.Select(p => new
             {
                 level = p.nameLevel,
@@ -86,6 +86,50 @@ namespace webApiipAweb.Controllers
                             name = p.header
                         })
                     })
+                })
+            }));
+        }
+
+        [HttpGet]
+        [Route("getSubjectsFromLevel")]
+        public async Task<ActionResult> GetSubjectsFromLevel(string level)
+        {
+            var currentLevel = await context.LevelStudings.FirstOrDefaultAsync(p => p.nameLevel == level);
+
+            return Ok(currentLevel?.Subjects.Select(p => new
+            {
+                Name = p.nameSubject
+            }));
+        }
+
+        [HttpGet]
+        [Route("getChaptersFromSubject")]
+        public async Task<ActionResult> GetChaptersFromSubject(string level, string subject)
+        {
+            var currentSubject = (await context.LevelStudings.FirstOrDefaultAsync(p => p.nameLevel == level))
+                ?.Subjects.FirstOrDefault(p => p.nameSubject == subject);
+
+            return Ok(currentSubject?.Chapters.Select(p => new
+            {
+                Name = p.name
+            }));
+        }
+
+        [HttpGet]
+        [Route("getTasksFromChapters")]
+        public async Task<ActionResult> GetTasksFromChapters(string level, string subject, string chapter)
+        {
+            var currentChapter = (await context.LevelStudings.FirstOrDefaultAsync(p => p.nameLevel == level))
+                ?.Subjects.FirstOrDefault(p => p.nameSubject == subject)
+                ?.Chapters.FirstOrDefault(p => p.name == chapter);
+
+            return Ok(currentChapter.TestPacks.Select(p => new
+            {
+                TestPackName = p.header,
+                Tasks = p.GetNumbers().Select(p => new
+                {
+                    IdTask = p.idTask,
+                    Question = p.textQuestion
                 })
             }));
         }

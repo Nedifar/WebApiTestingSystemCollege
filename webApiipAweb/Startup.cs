@@ -49,6 +49,7 @@ namespace webApiipAweb
             services.AddIdentity<Child, ApplicationRole>()
                 .AddEntityFrameworkStores<context>()
                 .AddDefaultTokenProviders();
+            services.AddSwaggerGen();
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -73,6 +74,8 @@ namespace webApiipAweb
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseStaticFiles();
             app.UseRouting();
             app.UseSentryTracing();

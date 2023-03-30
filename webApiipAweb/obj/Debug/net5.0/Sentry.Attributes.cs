@@ -11,7 +11,7 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyMetadata("Sentry.ProjectDirectory", "C:\\Users\\SU\\source\\repos\\webApiApiWeb\\webApiipAweb\\")]
+[assembly: System.Reflection.AssemblyMetadata("Sentry.ProjectDirectory", "C:\\Users\\Nedifar\\source\\repos\\webApiApiWeb\\webApiipAweb\\")]
 
 // Создано классом WriteCodeFragment MSBuild.
 
